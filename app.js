@@ -190,40 +190,45 @@ function applyRolePermissions() {
     const canEdit = !!currentAuthUser && currentAuthRole === 'editor';
     const isLoggedIn = !!currentAuthUser;
 
-    // Show/hide entire app container and login gate
-    const loginGate = document.getElementById('login-gate');
-    const appContainer = document.getElementById('app-container');
-    
-    if (isLoggedIn) {
-        // User logged in - show app, hide login gate
-        if (loginGate) loginGate.classList.add('hidden');
-        if (appContainer) appContainer.classList.remove('hidden');
-    } else {
-        // User not logged in - hide app, show login gate
-        if (loginGate) {
-            loginGate.classList.remove('hidden');
-            lucide.createIcons();
-        }
-        if (appContainer) appContainer.classList.add('hidden');
-    }
-
-    // Disable all app forms for viewers (read-only). Auth form is excluded.
-    document.querySelectorAll('form').forEach(form => {
-        if (form.id === 'auth-form') return;
-
-        form.querySelectorAll('input, select, textarea, button').forEach(el => {
-            // Keep navigation/export/import usable
-            if (el.id === 'import-file-input') return;
-            if (el.id === 'auth-login-btn' || el.id === 'auth-logout-btn') return;
-            if (el.closest && el.closest('#auth-modal')) return;
-
-            if (el.tagName === 'BUTTON' || el.type !== 'hidden') {
-                el.disabled = !canEdit;
-                el.classList.toggle('opacity-60', !canEdit);
-                el.classList.toggle('cursor-not-allowed', !canEdit);
+    // Wait for DOM to be ready
+    setTimeout(() => {
+        // Show/hide entire app container and login gate
+        const loginGate = document.getElementById('login-gate');
+        const appContainer = document.getElementById('app-container');
+        
+        if (isLoggedIn) {
+            // User logged in - show app, hide login gate
+            if (loginGate) loginGate.classList.add('hidden');
+            if (appContainer) appContainer.classList.remove('hidden');
+        } else {
+            // User not logged in - hide app, show login gate
+            if (loginGate) {
+                loginGate.classList.remove('hidden');
+                lucide.createIcons();
             }
+            if (appContainer) appContainer.classList.add('hidden');
+        }
+
+        // Disable all app forms for viewers (read-only). Auth form is excluded.
+        document.querySelectorAll('form').forEach(form => {
+            if (form.id === 'auth-form') return;
+
+            form.querySelectorAll('input, select, textarea, button').forEach(el => {
+                // Keep navigation/export/import usable
+                if (el.id === 'import-file-input') return;
+                if (el.id === 'auth-login-btn' || el.id === 'auth-logout-btn') return;
+                if (el.closest && el.closest('#auth-modal')) return;
+
+                if (el.tagName === 'BUTTON' || el.type !== 'hidden') {
+                    el.disabled = !canEdit;
+                    if (el.classList) {
+                        el.classList.toggle('opacity-60', !canEdit);
+                        el.classList.toggle('cursor-not-allowed', !canEdit);
+                    }
+                }
+            });
         });
-    });
+    }, 100);
 }
 
 function requireEditor() {
