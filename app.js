@@ -309,6 +309,8 @@ async function initAuth() {
 async function ensureProfileRow() {
     if (!currentAuthUser) return;
 
+    console.log('🔍 Checking profile for user:', currentAuthUser.id);
+
     // Read role if profile exists
     const { data: profile, error: selectErr } = await supabaseClient
         .schema('qa_tool')
@@ -317,13 +319,17 @@ async function ensureProfileRow() {
         .eq('id', currentAuthUser.id)
         .maybeSingle();
 
+    console.log('📊 Profile query result:', { profile, error: selectErr });
+
     if (selectErr) {
         // If schema not created yet or policy blocks, keep viewer and continue
+        console.error('❌ Error reading profile:', selectErr);
         currentAuthRole = 'viewer';
         return;
     }
 
     if (!profile) {
+        console.log('⚠️ No profile found, creating viewer profile');
         // Create profile row (allowed by RLS: insert own)
         const { error: insertErr } = await supabaseClient
             .schema('qa_tool')
@@ -331,6 +337,7 @@ async function ensureProfileRow() {
             .insert({ id: currentAuthUser.id, role: 'viewer' });
 
         if (insertErr) {
+            console.error('❌ Error creating profile:', insertErr);
             currentAuthRole = 'viewer';
             return;
         }
@@ -339,6 +346,7 @@ async function ensureProfileRow() {
     }
 
     currentAuthRole = profile.role || 'viewer';
+    console.log('✅ Role set to:', currentAuthRole);
 }
 
 function getLocalDatasetSnapshot() {
