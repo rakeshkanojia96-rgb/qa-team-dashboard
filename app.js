@@ -167,6 +167,18 @@ function setAuthPanelState() {
 
 function applyRolePermissions() {
     const canEdit = !!currentAuthUser && currentAuthRole === 'editor';
+    const isLoggedIn = !!currentAuthUser;
+
+    // Show/hide login gate
+    const loginGate = document.getElementById('login-gate');
+    if (loginGate) {
+        if (isLoggedIn) {
+            loginGate.classList.add('hidden');
+        } else {
+            loginGate.classList.remove('hidden');
+            lucide.createIcons();
+        }
+    }
 
     // Disable all app forms for viewers (read-only). Auth form is excluded.
     document.querySelectorAll('form').forEach(form => {
@@ -177,7 +189,6 @@ function applyRolePermissions() {
             if (el.id === 'import-file-input') return;
             if (el.id === 'auth-login-btn' || el.id === 'auth-logout-btn') return;
             if (el.closest && el.closest('#auth-modal')) return;
-            if (el.id === 'export-btn' || el.id === 'import-btn' || el.id === 'template-btn') return;
 
             if (el.tagName === 'BUTTON' || el.type !== 'hidden') {
                 el.disabled = !canEdit;
