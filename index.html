@@ -159,8 +159,8 @@
 
     <div id="app-container" class="flex h-screen">
         <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-white shadow-sm border-r border-gray-200 flex flex-col">
-            <nav class="p-2.5 space-y-0 flex-1 overflow-y-auto">
+        <aside class="w-64 bg-white shadow-sm border-r border-gray-200 flex flex-col relative">
+            <nav class="p-2.5 space-y-0 overflow-y-auto" style="max-height: calc(100vh - 120px);">
                 <div class="nav-item active flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('dashboard')">
                     <i data-lucide="layout-dashboard" width="16" height="16"></i>
                     <span class="font-medium text-sm">Dashboard</span>
@@ -209,8 +209,8 @@
                 </button>
             </nav>
             
-            <!-- Auth Section (Bottom) -->
-            <div class="border-t border-gray-200 px-2.5 py-2.5 bg-gray-50">
+            <!-- Auth Section (Fixed at Bottom) -->
+            <div class="absolute bottom-0 left-0 right-0 border-t border-gray-200 px-2.5 py-2.5 bg-gray-50">
                 <div class="mb-1.5">
                     <div id="sidebar-auth-status" class="text-xs text-gray-500 mb-0.5">Not logged in</div>
                     <div id="sidebar-auth-email" class="text-xs font-medium text-gray-700 truncate hidden"></div>
