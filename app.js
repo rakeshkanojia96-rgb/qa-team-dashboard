@@ -175,15 +175,21 @@ function applyRolePermissions() {
     const canEdit = !!currentAuthUser && currentAuthRole === 'editor';
     const isLoggedIn = !!currentAuthUser;
 
-    // Show/hide login gate
+    // Show/hide entire app container and login gate
     const loginGate = document.getElementById('login-gate');
-    if (loginGate) {
-        if (isLoggedIn) {
-            loginGate.classList.add('hidden');
-        } else {
+    const appContainer = document.getElementById('app-container');
+    
+    if (isLoggedIn) {
+        // User logged in - show app, hide login gate
+        if (loginGate) loginGate.classList.add('hidden');
+        if (appContainer) appContainer.classList.remove('hidden');
+    } else {
+        // User not logged in - hide app, show login gate
+        if (loginGate) {
             loginGate.classList.remove('hidden');
             lucide.createIcons();
         }
+        if (appContainer) appContainer.classList.add('hidden');
     }
 
     // Disable all app forms for viewers (read-only). Auth form is excluded.
