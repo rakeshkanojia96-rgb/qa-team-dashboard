@@ -46,11 +46,26 @@ let attendanceChart = null;
 
 // Load data from data.json (web-hosted) or localStorage on page load
 document.addEventListener('DOMContentLoaded', async function() {
+    // Auth form handler
+    document.getElementById('auth-form')?.addEventListener('submit', handleAuthSubmit);
+
+    // Initialize auth FIRST to restore session
+    await initAuth();
+    
+    // Load initial data (will only load if authenticated)
     await loadAllData();
-    updateDashboard();
+    
+    // Render all sections with loaded data
+    renderDashboard();
     renderTeamMembers();
-    updateAllDropdowns();
-    setupEventListeners();
+    renderPerformanceMetrics();
+    renderAttendance();
+    renderHolidays();
+    renderAppraisal();
+    renderAnalytics();
+    updateAttendanceStats();
+    
+    // Initialize Lucide icons
     lucide.createIcons();
     
     // Set today's date as default for attendance
@@ -68,8 +83,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     const lastSection = localStorage.getItem('lastActiveSection') || 'dashboard';
     showSection(lastSection);
 
-    // Initialize auth after base UI is ready (dormant for now)
-    initAuth();
+    // Setup event listeners
+    setupEventListeners();
 });
 
 // Load all data from data.json (web-hosted) or localStorage as fallback
@@ -333,15 +348,19 @@ async function initAuth() {
         currentAuthUser = data.session.user;
         await ensureProfileRow();
         await loadCloudDatasetIntoApp();
+        console.log('✅ Session restored:', currentAuthUser.email, 'Role:', currentAuthRole);
     } else {
         currentAuthUser = null;
         currentAuthRole = 'viewer';
+        console.log('⚠️ No session found');
     }
 
+    // Update UI after session check
     setAuthPanelState();
     applyRolePermissions();
 
     supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+        console.log('🔄 Auth state changed:', _event);
         currentAuthUser = session?.user || null;
         currentAuthRole = 'viewer';
 
