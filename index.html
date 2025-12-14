@@ -13,14 +13,12 @@
 <body class="bg-gray-50">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <i data-lucide="shield-check" class="text-indigo-600" width="32" height="32"></i>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-900">QA Team Performance Dashboard</h1>
-                        <p class="text-sm text-gray-500">Track, Analyze, and Improve Team Performance</p>
-                    </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center space-x-3">
+                <i data-lucide="shield-check" class="text-indigo-600" width="28" height="28"></i>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">QA Team Performance Dashboard</h1>
+                    <p class="text-xs text-gray-500">Track, Analyze, and Improve Team Performance</p>
                 </div>
             </div>
         </div>
@@ -162,68 +160,68 @@
     <div id="app-container" class="flex h-screen">
         <!-- Sidebar Navigation -->
         <aside class="w-64 bg-white shadow-sm border-r border-gray-200 flex flex-col">
-            <nav class="p-3 space-y-0.5 flex-1 overflow-y-auto">
-                <div class="nav-item active flex items-center space-x-2.5 p-2 rounded-lg" onclick="showSection('dashboard')">
+            <nav class="p-2.5 space-y-0 flex-1 overflow-y-auto">
+                <div class="nav-item active flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('dashboard')">
                     <i data-lucide="layout-dashboard" width="16" height="16"></i>
                     <span class="font-medium text-sm">Dashboard</span>
                 </div>
-                <div class="nav-item flex items-center space-x-2.5 p-2 rounded-lg" onclick="showSection('team-members')">
+                <div class="nav-item flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('team-members')">
                     <i data-lucide="users" width="16" height="16"></i>
                     <span class="font-medium text-sm">Team Members</span>
                 </div>
-                <div class="nav-item flex items-center space-x-2.5 p-2 rounded-lg" onclick="showSection('performance')">
+                <div class="nav-item flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('performance')">
                     <i data-lucide="trending-up" width="16" height="16"></i>
                     <span class="font-medium text-sm">Performance</span>
                 </div>
-                <div class="nav-item flex items-center space-x-2.5 p-2 rounded-lg" onclick="showSection('attendance')">
+                <div class="nav-item flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('attendance')">
                     <i data-lucide="calendar-check" width="16" height="16"></i>
                     <span class="font-medium text-sm">Attendance</span>
                 </div>
-                <div class="nav-item flex items-center space-x-2.5 p-2 rounded-lg" onclick="showSection('holidays')">
+                <div class="nav-item flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('holidays')">
                     <i data-lucide="calendar-x" width="16" height="16"></i>
                     <span class="font-medium text-sm">Holidays</span>
                 </div>
-                <div class="nav-item flex items-center space-x-2.5 p-2 rounded-lg" onclick="showSection('appraisal')">
+                <div class="nav-item flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('appraisal')">
                     <i data-lucide="star" width="16" height="16"></i>
                     <span class="font-medium text-sm">Appraisal</span>
                 </div>
-                <div class="nav-item flex items-center space-x-2.5 p-2 rounded-lg" onclick="showSection('analytics')">
+                <div class="nav-item flex items-center space-x-2 px-2.5 py-1.5 rounded-lg" onclick="showSection('analytics')">
                     <i data-lucide="bar-chart-3" width="16" height="16"></i>
                     <span class="font-medium text-sm">Analytics</span>
                 </div>
                 
                 <!-- Divider -->
-                <div class="border-t border-gray-200 my-2"></div>
+                <div class="border-t border-gray-200 my-1.5"></div>
                 
                 <!-- Data Management -->
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 mt-2 mb-1">Data</p>
-                <button onclick="showExportMenu()" class="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-100 transition-colors text-left">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2.5 mt-1.5 mb-1">Data</p>
+                <button onclick="showExportMenu()" class="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-left">
                     <i data-lucide="download" width="16" height="16" class="text-gray-600"></i>
                     <span class="font-medium text-sm text-gray-700">Export</span>
                 </button>
-                <button onclick="showImportMenu()" class="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-100 transition-colors text-left">
+                <button onclick="showImportMenu()" class="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-left">
                     <i data-lucide="upload" width="16" height="16" class="text-gray-600"></i>
                     <span class="font-medium text-sm text-gray-700">Import</span>
                 </button>
-                <button onclick="downloadCurrentTemplate()" class="w-full flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-100 transition-colors text-left">
+                <button onclick="downloadCurrentTemplate()" class="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-left">
                     <i data-lucide="file-text" width="16" height="16" class="text-gray-600"></i>
                     <span class="font-medium text-sm text-gray-700">Templates</span>
                 </button>
             </nav>
             
             <!-- Auth Section (Bottom) -->
-            <div class="border-t border-gray-200 p-3 bg-gray-50">
-                <div class="mb-2">
-                    <div id="sidebar-auth-status" class="text-xs text-gray-500 mb-1">Not logged in</div>
-                    <div id="sidebar-auth-email" class="text-sm font-medium text-gray-700 truncate hidden"></div>
-                    <span id="sidebar-auth-role" class="hidden text-xs px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 inline-block mt-1"></span>
+            <div class="border-t border-gray-200 px-2.5 py-2.5 bg-gray-50">
+                <div class="mb-1.5">
+                    <div id="sidebar-auth-status" class="text-xs text-gray-500 mb-0.5">Not logged in</div>
+                    <div id="sidebar-auth-email" class="text-xs font-medium text-gray-700 truncate hidden"></div>
+                    <span id="sidebar-auth-role" class="hidden text-xs px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 inline-block mt-0.5"></span>
                 </div>
-                <button id="sidebar-login-btn" onclick="openAuthModal()" class="w-full btn-secondary text-sm py-2 flex items-center justify-center space-x-2">
-                    <i data-lucide="log-in" width="16" height="16"></i>
+                <button id="sidebar-login-btn" onclick="openAuthModal()" class="w-full btn-secondary text-xs py-1.5 flex items-center justify-center space-x-1.5">
+                    <i data-lucide="log-in" width="14" height="14"></i>
                     <span>Login</span>
                 </button>
-                <button id="sidebar-logout-btn" onclick="logout()" class="w-full btn-secondary text-sm py-2 hidden flex items-center justify-center space-x-2">
-                    <i data-lucide="log-out" width="16" height="16"></i>
+                <button id="sidebar-logout-btn" onclick="logout()" class="w-full btn-secondary text-xs py-1.5 hidden flex items-center justify-center space-x-1.5">
+                    <i data-lucide="log-out" width="14" height="14"></i>
                     <span>Logout</span>
                 </button>
             </div>
