@@ -311,7 +311,8 @@ async function ensureProfileRow() {
 
     // Read role if profile exists
     const { data: profile, error: selectErr } = await supabaseClient
-        .from('qa_tool.profiles')
+        .schema('qa_tool')
+        .from('profiles')
         .select('id, role')
         .eq('id', currentAuthUser.id)
         .maybeSingle();
@@ -325,7 +326,8 @@ async function ensureProfileRow() {
     if (!profile) {
         // Create profile row (allowed by RLS: insert own)
         const { error: insertErr } = await supabaseClient
-            .from('qa_tool.profiles')
+            .schema('qa_tool')
+            .from('profiles')
             .insert({ id: currentAuthUser.id, role: 'viewer' });
 
         if (insertErr) {
@@ -375,7 +377,8 @@ async function loadCloudDatasetIntoApp() {
     if (!supabaseClient) return;
 
     const { data, error } = await supabaseClient
-        .from('qa_tool.user_app_data')
+        .schema('qa_tool')
+        .from('user_app_data')
         .select('data')
         .eq('owner_id', currentAuthUser.id)
         .maybeSingle();
@@ -390,7 +393,8 @@ async function loadCloudDatasetIntoApp() {
         if (currentAuthRole === 'editor') {
             // Create an empty dataset row so future updates work
             await supabaseClient
-                .from('qa_tool.user_app_data')
+                .schema('qa_tool')
+                .from('user_app_data')
                 .insert({ owner_id: currentAuthUser.id, data: getLocalDatasetSnapshot() });
         } else {
             showNotification('No cloud data found for your account (read-only). Ask admin to initialize or upgrade to Editor.', 'error');
@@ -434,7 +438,8 @@ async function saveCloudDataset() {
     const dataset = getLocalDatasetSnapshot();
 
     const { error } = await supabaseClient
-        .from('qa_tool.user_app_data')
+        .schema('qa_tool')
+        .from('user_app_data')
         .upsert({ owner_id: currentAuthUser.id, data: dataset }, { onConflict: 'owner_id' });
 
     isCloudSaving = false;
