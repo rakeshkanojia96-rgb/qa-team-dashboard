@@ -74,6 +74,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Load all data from data.json (web-hosted) or localStorage as fallback
 async function loadAllData() {
+    // Don't load any data if not authenticated
+    if (!currentAuthUser) {
+        console.log('⚠️ Not authenticated, skipping data load');
+        return;
+    }
+    
     try {
         // Try to load from data.json first (web-hosted, survives browser clear)
         const response = await fetch('data.json');
@@ -289,6 +295,23 @@ async function handleAuthSubmit(e) {
 async function logout() {
     if (!supabaseClient) return;
     await supabaseClient.auth.signOut();
+    
+    // Clear auth state immediately
+    currentAuthUser = null;
+    currentAuthRole = 'viewer';
+    
+    // Clear all data
+    teamMembers = [];
+    performanceData = [];
+    attendanceData = [];
+    goalsData = [];
+    ratingsData = [];
+    holidaysData = [];
+    
+    // Update UI
+    setAuthPanelState();
+    applyRolePermissions();
+    
     showNotification('Logged out.', 'success');
 }
 
