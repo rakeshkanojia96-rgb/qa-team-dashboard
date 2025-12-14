@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Team Performance Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="shield-check" class="text-indigo-600" width="32" height="32"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">QA Team Performance Dashboard</h1>
+                        <p class="text-sm text-gray-500">Track, Analyze, and Improve Team Performance</p>
+                    </div>
+                </div>
+                <div id="page-actions" class="flex items-center space-x-3">
+                    <!-- Page-specific buttons will be shown/hidden based on active section -->
+                    <button id="export-btn" onclick="showExportMenu()" class="btn-secondary flex items-center space-x-2 hidden">
+                        <i data-lucide="download" width="18" height="18"></i>
+                        <span>Export</span>
+                    </button>
+                    <button id="import-btn" onclick="showImportMenu()" class="btn-secondary flex items-center space-x-2 hidden">
+                        <i data-lucide="upload" width="18" height="18"></i>
+                        <span>Import</span>
+                    </button>
+                    <button id="template-btn" onclick="downloadCurrentTemplate()" class="btn-secondary flex items-center space-x-2 hidden">
+                        <i data-lucide="file-text" width="18" height="18"></i>
+                        <span>Template</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white shadow-sm border-r border-gray-200">
+            <nav class="p-4 space-y-2">
+                <div class="nav-item active flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('dashboard')">
+                    <i data-lucide="layout-dashboard" width="20" height="20"></i>
+                    <span class="font-medium">Dashboard</span>
+                </div>
+                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('team-members')">
+                    <i data-lucide="users" width="20" height="20"></i>
+                    <span class="font-medium">Team Members</span>
+                </div>
+                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('performance')">
+                    <i data-lucide="trending-up" width="20" height="20"></i>
+                    <span class="font-medium">Performance Metrics</span>
+                </div>
+                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('attendance')">
+                    <i data-lucide="calendar-check" width="20" height="20"></i>
+                    <span class="font-medium">Attendance</span>
+                </div>
+                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('holidays')">
+                    <i data-lucide="calendar-x" width="20" height="20"></i>
+                    <span class="font-medium">Holidays & Weekends</span>
+                </div>
+                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('appraisal')">
+                    <i data-lucide="star" width="20" height="20"></i>
+                    <span class="font-medium">Appraisal</span>
+                </div>
+                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('analytics')">
+                    <i data-lucide="bar-chart-3" width="20" height="20"></i>
+                    <span class="font-medium">Analytics</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="section">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Team Overview</h2>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="card stat-card p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Total Team Members</p>
+                                <h3 class="text-3xl font-bold mt-2" id="total-members">0</h3>
+                            </div>
+                            <i data-lucide="users" width="32" height="32" class="text-white/60"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card-green p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Tests Executed (Month)</p>
+                                <h3 class="text-3xl font-bold mt-2" id="total-tests">0</h3>
+                            </div>
+                            <i data-lucide="check-circle" width="32" height="32" class="text-white/60"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card-orange p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Bugs Found (Month)</p>
+                                <h3 class="text-3xl font-bold mt-2" id="total-bugs">0</h3>
+                            </div>
+                            <i data-lucide="bug" width="32" height="32" class="text-white/60"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card-blue p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Avg Attendance</p>
+                                <h3 class="text-3xl font-bold mt-2" id="avg-attendance">0%</h3>
+                            </div>
+                            <i data-lucide="calendar" width="32" height="32" class="text-white/60"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Members Quick View -->
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Team Members</h3>
+                    <div id="team-members-list" class="space-y-3">
+                        <p class="text-gray-500">No team members added yet. Go to Team Members section to add.</p>
+                    </div>
+                </div>
+
+                <!-- Recent Performance Chart -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Team Performance Trend</h3>
+                    <canvas id="performanceChart" height="80"></canvas>
+                </div>
+            </div>
+
+            <!-- Team Members Section -->
+            <div id="team-members-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Team Members</h2>
+                    <button onclick="showAddMemberModal()" class="btn-primary flex items-center space-x-2">
+                        <i data-lucide="user-plus" width="18" height="18"></i>
+                        <span>Add Member</span>
+                    </button>
+                </div>
+
+                <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Members will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Performance Metrics Section -->
+            <div id="performance-section" class="section hidden">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Performance Metrics</h2>
+                
+                <div class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Add Performance Data</h3>
+                    <form id="performance-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Member <span class="text-red-500">*</span></label>
+                                <select id="perf-member" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="">Choose a member...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                                <input type="text" id="perf-project" placeholder="e.g., DSOT, DMB, CMUI" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Period Type <span class="text-red-500">*</span></label>
+                                <select id="perf-period-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" onchange="updatePeriodInput()" required>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly (Date Range)</option>
+                                    <option value="monthly" selected>Monthly</option>
+                                </select>
+                            </div>
+                            <div id="period-input-container">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <span id="period-label">Month</span> <span class="text-red-500">*</span>
+                                </label>
+                                <input type="month" id="perf-period" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Test Cases Created</label>
+                                <input type="number" id="perf-tests-created" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Test Cases Executed</label>
+                                <input type="number" id="perf-tests-executed" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Defects Reported</label>
+                                <input type="number" id="perf-defects-reported" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Asana Tickets</label>
+                                <input type="number" id="perf-asana-tickets" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Save Performance Data</button>
+                    </form>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Performance History</h3>
+                    <div id="performance-history" class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Period</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date/Week/Month</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">TC Created</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">TC Executed</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Defects</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asana</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performance-table-body" class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="9" class="px-6 py-4 text-center text-gray-500">No performance data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Section -->
+            <div id="attendance-section" class="section hidden">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Attendance Tracking</h2>
+                
+                <!-- Attendance Mode Tabs -->
+                <div class="mb-6 border-b border-gray-200">
+                    <nav class="flex space-x-8">
+                        <button onclick="switchAttendanceMode('single')" id="single-mode-tab" class="attendance-tab active py-4 px-1 border-b-2 border-indigo-500 font-medium text-sm text-indigo-600">
+                            Single Day
+                        </button>
+                        <button onclick="switchAttendanceMode('bulk')" id="bulk-mode-tab" class="attendance-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Bulk Marking
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Single Day Attendance Form -->
+                <div id="single-attendance-form" class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Mark Attendance (Single Day)</h3>
+                    <form id="attendance-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Member</label>
+                                <select id="att-member" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="">Choose a member...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <input type="date" id="att-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                <select id="att-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="available">Available</option>
+                                    <option value="pto-full">PTO - Full Day</option>
+                                    <option value="pto-first-half">PTO - First Half</option>
+                                    <option value="pto-second-half">PTO - Second Half</option>
+                                    <option value="lwp-full">LWP - Full Day</option>
+                                    <option value="lwp-first-half">LWP - First Half</option>
+                                    <option value="lwp-second-half">LWP - Second Half</option>
+                                    <option value="pl-full">PL - Full Day</option>
+                                    <option value="co-full">CO - Full Day</option>
+                                    <option value="holiday">Holiday</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                            <input type="text" id="att-notes" placeholder="e.g., Sick leave, Client meeting, etc." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+                        <button type="submit" class="btn-primary">Save Attendance</button>
+                    </form>
+                </div>
+
+                <!-- Bulk Attendance Form -->
+                <div id="bulk-attendance-form" class="card p-6 mb-6 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Bulk Mark Attendance</h3>
+                        <p class="text-xs text-gray-500">
+                            <i data-lucide="info" width="14" height="14" class="inline"></i>
+                            Weekends (Sat & Sun) are automatically excluded
+                        </p>
+                    </div>
+                    <form id="bulk-attendance-form-element" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Members</label>
+                                <div class="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto">
+                                    <label class="flex items-center mb-2">
+                                        <input type="checkbox" id="select-all-members" onchange="toggleAllMembers()" class="mr-2 rounded">
+                                        <span class="font-medium">Select All</span>
+                                    </label>
+                                    <hr class="mb-2">
+                                    <div id="bulk-members-list">
+                                        <!-- Member checkboxes will be added here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Period Type</label>
+                                <select id="bulk-period-type" onchange="updateBulkPeriodInput()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="multiple">Multiple Days</option>
+                                    <option value="week">Week Range</option>
+                                    <option value="month">Entire Month</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="bulk-period-container">
+                            <!-- Period inputs will be dynamically added here -->
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                <select id="bulk-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="available">Available</option>
+                                    <option value="pto-full">PTO - Full Day</option>
+                                    <option value="pto-first-half">PTO - First Half</option>
+                                    <option value="pto-second-half">PTO - Second Half</option>
+                                    <option value="lwp-full">LWP - Full Day</option>
+                                    <option value="lwp-first-half">LWP - First Half</option>
+                                    <option value="lwp-second-half">LWP - Second Half</option>
+                                    <option value="pl-full">PL - Full Day</option>
+                                    <option value="co-full">CO - Full Day</option>
+                                    <option value="holiday">Holiday</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                                <input type="text" id="bulk-notes" placeholder="e.g., Team outing, Holiday, etc." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <button type="submit" class="btn-primary">Mark Attendance</button>
+                            <span id="bulk-preview" class="text-sm text-gray-600"></span>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Attendance Calendar View -->
+                <div class="card p-6 mb-6">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-3">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">Filter by Member:</label>
+                            <select id="calendar-member-filter" onchange="renderAttendanceCalendar()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option value="">All Members</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">View:</label>
+                            <select id="calendar-view-type" onchange="changeCalendarViewType()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-700">
+                                <option value="month">Monthly</option>
+                                <option value="year">Yearly</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-2" id="month-navigation">
+                                <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-gray-100 rounded-lg" title="Previous Month">
+                                    <i data-lucide="chevron-left" width="20" height="20"></i>
+                                </button>
+                                <div class="flex items-center space-x-2">
+                                    <select id="calendar-month-select" onchange="changeCalendarToSelected()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold">
+                                        <option value="0">January</option>
+                                        <option value="1">February</option>
+                                        <option value="2">March</option>
+                                        <option value="3">April</option>
+                                        <option value="4">May</option>
+                                        <option value="5">June</option>
+                                        <option value="6">July</option>
+                                        <option value="7">August</option>
+                                        <option value="8">September</option>
+                                        <option value="9">October</option>
+                                        <option value="10">November</option>
+                                        <option value="11">December</option>
+                                    </select>
+                                    <select id="calendar-year-select" onchange="changeCalendarToSelected()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold">
+                                        <!-- Years will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-gray-100 rounded-lg" title="Next Month">
+                                    <i data-lucide="chevron-right" width="20" height="20"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center space-x-2 hidden" id="year-navigation">
+                                <button onclick="changeCalendarYear(-1)" class="p-2 hover:bg-gray-100 rounded-lg" title="Previous Year">
+                                    <i data-lucide="chevron-left" width="20" height="20"></i>
+                                </button>
+                                <select id="calendar-year-select-yearly" onchange="changeCalendarToSelectedYear()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold">
+                                    <!-- Years will be populated by JavaScript -->
+                                </select>
+                                <button onclick="changeCalendarYear(1)" class="p-2 hover:bg-gray-100 rounded-lg" title="Next Year">
+                                    <i data-lucide="chevron-right" width="20" height="20"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
+                        <!-- Calendar -->
+                        <div id="attendance-calendar" class="lg:col-span-3">
+                            <!-- Calendar will be rendered here -->
+                        </div>
+                        
+                        <!-- Quick Leave Summary -->
+                        <div class="lg:col-span-1">
+                            <div class="card p-4 sticky top-4">
+                                <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
+                                    <i data-lucide="calendar-days" width="16" height="16" class="mr-2"></i>
+                                    Leave Summary
+                                </h4>
+                                <div id="quick-leave-summary" class="space-y-2 text-xs max-h-96 overflow-y-auto">
+                                    <!-- Leave summary will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-cyan-400"></div>
+                            <span>Today</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-green-300"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-blue-300"></div>
+                            <span>PTO (Full)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-blue-200"></div>
+                            <span>PTO (Half)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-orange-300"></div>
+                            <span>LWP (Full)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-orange-200"></div>
+                            <span>LWP (Half)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-purple-300"></div>
+                            <span>PL</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-teal-300"></div>
+                            <span>CO</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-gray-200 border-2 border-gray-400"></div>
+                            <span>Weekend</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-yellow-100 border-2 border-yellow-500"></div>
+                            <span>Holiday</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Edit Attendance -->
+                <div class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Bulk Edit Attendance</h3>
+                    <form id="bulk-edit-attendance-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-sm font-medium text-gray-700">Select Members</label>
+                                    <button type="button" onclick="toggleAllBulkEditMembers()" class="text-xs text-indigo-600 hover:text-indigo-800">
+                                        Select All / None
+                                    </button>
+                                </div>
+                                <div id="bulk-edit-members-list" class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-3">
+                                    <!-- Member checkboxes will be populated here -->
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                                <div class="space-y-2">
+                                    <input type="date" id="bulk-edit-start-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <span class="text-xs text-gray-500">to</span>
+                                    <input type="date" id="bulk-edit-end-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    <i data-lucide="info" width="14" height="14" class="inline"></i>
+                                    Weekends (Sat & Sun) are automatically excluded
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">New Status</label>
+                                <select id="bulk-edit-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="available">Available</option>
+                                    <option value="pto-full">PTO - Full Day</option>
+                                    <option value="pto-first-half">PTO - First Half</option>
+                                    <option value="pto-second-half">PTO - Second Half</option>
+                                    <option value="lwp-full">LWP - Full Day</option>
+                                    <option value="lwp-first-half">LWP - First Half</option>
+                                    <option value="lwp-second-half">LWP - Second Half</option>
+                                    <option value="pl-full">PL - Full Day</option>
+                                    <option value="co-full">CO - Full Day</option>
+                                    <option value="holiday">Holiday</option>
+                                </select>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 mt-3">Notes (Optional)</label>
+                                <input type="text" id="bulk-edit-notes" placeholder="e.g., Bulk updated" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div id="bulk-edit-preview" class="text-sm text-gray-600"></div>
+                            <button type="submit" class="btn-primary">Update Attendance</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Attendance Summary</h3>
+                    <div id="attendance-summary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <!-- Summary cards will be added here -->
+                    </div>
+                    <div id="attendance-history" class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body" class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No attendance records available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Holidays & Weekends Section -->
+            <div id="holidays-section" class="section hidden">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Holidays & Weekends Management</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Weekend Settings -->
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Weekend Configuration</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center space-x-3 mb-2">
+                                    <input type="checkbox" id="exclude-weekends" checked class="rounded">
+                                    <span class="font-medium">Exclude weekends from attendance calculations</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Weekend Days</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" value="0" class="weekend-day rounded" checked>
+                                        <span>Sunday</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" value="1" class="weekend-day rounded">
+                                        <span>Monday</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" value="2" class="weekend-day rounded">
+                                        <span>Tuesday</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" value="3" class="weekend-day rounded">
+                                        <span>Wednesday</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" value="4" class="weekend-day rounded">
+                                        <span>Thursday</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" value="5" class="weekend-day rounded">
+                                        <span>Friday</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" value="6" class="weekend-day rounded" checked>
+                                        <span>Saturday</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="button" onclick="saveWeekendSettings()" class="btn-primary w-full">Save Weekend Settings</button>
+                        </div>
+                    </div>
+
+                    <!-- Add Holiday -->
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Add Holiday</h3>
+                        <form id="add-holiday-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Holiday Name</label>
+                                <input type="text" id="holiday-name" placeholder="e.g., Diwali, Christmas" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <input type="date" id="holiday-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                                <select id="holiday-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <option value="public">Public Holiday</option>
+                                    <option value="company">Company Holiday</option>
+                                    <option value="optional">Optional Holiday</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+                                <textarea id="holiday-description" rows="2" placeholder="Additional details..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary w-full">Add Holiday</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Holidays List -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Holidays List</h3>
+                    <div id="holidays-list" class="space-y-3">
+                        <!-- Holidays will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appraisal Section -->
+            <div id="appraisal-section" class="section hidden">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Appraisal Management</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Set Goals</h3>
+                        <form id="goals-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Member</label>
+                                <select id="goal-member" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="">Choose a member...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Goal Title</label>
+                                <input type="text" id="goal-title" placeholder="e.g., Improve automation coverage" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Target Date</label>
+                                <input type="date" id="goal-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                <textarea id="goal-description" rows="3" placeholder="Describe the goal..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary w-full">Add Goal</button>
+                        </form>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Performance Rating</h3>
+                        <form id="rating-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Member</label>
+                                <select id="rating-member" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="">Choose a member...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Review Period</label>
+                                <select id="rating-period" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="Q1">Q1 (Jan-Mar)</option>
+                                    <option value="Q2">Q2 (Apr-Jun)</option>
+                                    <option value="Q3">Q3 (Jul-Sep)</option>
+                                    <option value="Q4">Q4 (Oct-Dec)</option>
+                                    <option value="Annual">Annual</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Overall Rating</label>
+                                <select id="rating-score" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                                    <option value="5">5 - Outstanding</option>
+                                    <option value="4">4 - Exceeds Expectations</option>
+                                    <option value="3">3 - Meets Expectations</option>
+                                    <option value="2">2 - Needs Improvement</option>
+                                    <option value="1">1 - Unsatisfactory</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Strengths</label>
+                                <textarea id="rating-strengths" rows="2" placeholder="Key strengths..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Areas for Improvement</label>
+                                <textarea id="rating-improvements" rows="2" placeholder="Areas to improve..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary w-full">Save Rating</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Appraisal History</h3>
+                    <div id="appraisal-history">
+                        <p class="text-gray-500">No appraisal data available</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="section hidden">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Team Analytics</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Test Execution Trends</h3>
+                        <canvas id="testTrendsChart"></canvas>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Bug Distribution</h3>
+                        <canvas id="bugDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Team Member Comparison</h3>
+                        <canvas id="memberComparisonChart"></canvas>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Attendance Overview</h3>
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div id="add-member-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Add Team Member</h3>
+                <button onclick="closeAddMemberModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" width="24" height="24"></i>
+                </button>
+            </div>
+            <form id="add-member-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input type="text" id="member-name" placeholder="Enter full name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="member-email" placeholder="email@example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select id="member-role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                        <option value="QA Engineer">QA Engineer</option>
+                        <option value="Senior QA Engineer">Senior QA Engineer</option>
+                        <option value="Lead QA Engineer">Lead QA Engineer</option>
+                        <option value="QA Automation Engineer">QA Automation Engineer</option>
+                        <option value="QA Analyst">QA Analyst</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Joining Date</label>
+                    <input type="date" id="member-joining" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Add Member</button>
+                    <button type="button" onclick="closeAddMemberModal()" class="btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Member Modal -->
+    <div id="edit-member-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Edit Team Member</h3>
+                <button onclick="closeEditMemberModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" width="24" height="24"></i>
+                </button>
+            </div>
+            <form id="edit-member-form" class="space-y-4">
+                <input type="hidden" id="edit-member-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input type="text" id="edit-member-name" placeholder="Enter full name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="edit-member-email" placeholder="email@example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <select id="edit-member-role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                        <option value="QA Engineer">QA Engineer</option>
+                        <option value="Senior QA Engineer">Senior QA Engineer</option>
+                        <option value="Lead QA Engineer">Lead QA Engineer</option>
+                        <option value="QA Automation Engineer">QA Automation Engineer</option>
+                        <option value="QA Analyst">QA Analyst</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Joining Date</label>
+                    <input type="date" id="edit-member-joining" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Update Member</button>
+                    <button type="button" onclick="closeEditMemberModal()" class="btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Day Attendance Details Modal -->
+    <div id="day-attendance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="day-attendance-title" class="text-2xl font-bold text-gray-900">Attendance Details</h3>
+                <button onclick="closeDayAttendanceModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" width="24" height="24"></i>
+                </button>
+            </div>
+            <div id="day-attendance-content" class="space-y-3">
+                <!-- Attendance records will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Attendance Modal -->
+    <div id="edit-attendance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Edit Attendance</h3>
+                <button onclick="closeEditAttendanceModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" width="24" height="24"></i>
+                </button>
+            </div>
+            <form id="edit-attendance-form" class="space-y-4">
+                <input type="hidden" id="edit-att-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Team Member</label>
+                    <select id="edit-att-member" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                        <option value="">Choose a member...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date" id="edit-att-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="edit-att-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                        <option value="available">Available</option>
+                        <option value="pto-full">PTO - Full Day</option>
+                        <option value="pto-first-half">PTO - First Half</option>
+                        <option value="pto-second-half">PTO - Second Half</option>
+                        <option value="lwp-full">LWP - Full Day</option>
+                        <option value="lwp-first-half">LWP - First Half</option>
+                        <option value="lwp-second-half">LWP - Second Half</option>
+                        <option value="pl-full">PL - Full Day</option>
+                        <option value="co-full">CO - Full Day</option>
+                        <option value="holiday">Holiday</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                    <input type="text" id="edit-att-notes" placeholder="e.g., Sick leave, Client meeting, etc." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Update Attendance</button>
+                    <button type="button" onclick="closeEditAttendanceModal()" class="btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Performance Modal -->
+    <div id="edit-performance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Edit Performance Data</h3>
+                <button onclick="closeEditPerformanceModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" width="24" height="24"></i>
+                </button>
+            </div>
+            <form id="edit-performance-form" class="space-y-4">
+                <input type="hidden" id="edit-perf-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Team Member</label>
+                        <select id="edit-perf-member" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                            <option value="">Choose a member...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                        <input type="text" id="edit-perf-project" placeholder="e.g., DSOT, DMB, CMUI" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Period Type</label>
+                        <select id="edit-perf-period-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" onchange="updateEditPeriodInput()" required>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly (Date Range)</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div id="edit-period-input-container">
+                        <!-- Dynamic period input -->
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Test Cases Created</label>
+                        <input type="number" id="edit-perf-tests-created" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Test Cases Executed</label>
+                        <input type="number" id="edit-perf-tests-executed" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Defects Reported</label>
+                        <input type="number" id="edit-perf-defects-reported" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Asana Tickets</label>
+                        <input type="number" id="edit-perf-asana-tickets" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Update Performance</button>
+                    <button type="button" onclick="closeEditPerformanceModal()" class="btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden file inputs for import -->
+    <input type="file" id="import-file-input" accept=".json,.csv,.xlsx,.xls" class="hidden">
+
+    <!-- Export Menu Modal -->
+    <div id="export-menu-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Export Data</h3>
+                <button onclick="closeExportMenu()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" width="24" height="24"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <button onclick="exportAsJSON()" class="w-full btn-primary text-left flex items-center justify-between">
+                    <span>Export as JSON</span>
+                    <i data-lucide="file-json" width="20" height="20"></i>
+                </button>
+                <button onclick="exportAsCSV('members')" class="w-full btn-secondary text-left flex items-center justify-between">
+                    <span>Export Team Members CSV</span>
+                    <i data-lucide="users" width="20" height="20"></i>
+                </button>
+                <button onclick="exportAsCSV('performance')" class="w-full btn-secondary text-left flex items-center justify-between">
+                    <span>Export Performance CSV</span>
+                    <i data-lucide="trending-up" width="20" height="20"></i>
+                </button>
+                <button onclick="exportAsCSV('attendance')" class="w-full btn-secondary text-left flex items-center justify-between">
+                    <span>Export Attendance CSV</span>
+                    <i data-lucide="calendar-check" width="20" height="20"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Menu Modal -->
+    <div id="import-menu-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Import Data</h3>
+                <button onclick="closeImportMenu()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" width="24" height="24"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <button onclick="importJSON()" class="w-full btn-primary text-left flex items-center justify-between">
+                    <span>Import JSON (Full Data)</span>
+                    <i data-lucide="file-json" width="20" height="20"></i>
+                </button>
+                <button onclick="importCSV('members')" class="w-full btn-secondary text-left flex items-center justify-between">
+                    <span>Import Team Members CSV</span>
+                    <i data-lucide="users" width="20" height="20"></i>
+                </button>
+                <button onclick="importCSV('performance')" class="w-full btn-secondary text-left flex items-center justify-between">
+                    <span>Import Performance CSV</span>
+                    <i data-lucide="trending-up" width="20" height="20"></i>
+                </button>
+                <button onclick="importCSV('attendance')" class="w-full btn-secondary text-left flex items-center justify-between">
+                    <span>Import Attendance CSV</span>
+                    <i data-lucide="calendar-check" width="20" height="20"></i>
+                </button>
+            </div>
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p class="text-sm text-blue-800">
+                    <i data-lucide="info" width="16" height="16" class="inline mr-1"></i>
+                    Need templates? Click the "Templates" button to download CSV templates.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
