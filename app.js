@@ -161,28 +161,65 @@ function setupEventListeners() {
 }
 
 function setAuthPanelState() {
+    // Header auth elements
     const statusEl = document.getElementById('auth-status');
     const roleBadge = document.getElementById('auth-role-badge');
     const loginBtn = document.getElementById('auth-login-btn');
     const logoutBtn = document.getElementById('auth-logout-btn');
 
-    if (!statusEl || !roleBadge || !loginBtn || !logoutBtn) return;
+    // Sidebar auth elements
+    const sidebarStatus = document.getElementById('sidebar-auth-status');
+    const sidebarEmail = document.getElementById('sidebar-auth-email');
+    const sidebarRole = document.getElementById('sidebar-auth-role');
+    const sidebarLoginBtn = document.getElementById('sidebar-login-btn');
+    const sidebarLogoutBtn = document.getElementById('sidebar-logout-btn');
 
     if (currentAuthUser) {
-        statusEl.textContent = currentAuthUser.email || 'Logged in';
-        roleBadge.textContent = (currentAuthRole || 'viewer').toUpperCase();
-        roleBadge.classList.remove('hidden');
-        roleBadge.classList.toggle('bg-emerald-100', currentAuthRole === 'editor');
-        roleBadge.classList.toggle('text-emerald-800', currentAuthRole === 'editor');
-        roleBadge.classList.toggle('bg-gray-100', currentAuthRole !== 'editor');
-        roleBadge.classList.toggle('text-gray-700', currentAuthRole !== 'editor');
-        loginBtn.classList.add('hidden');
-        logoutBtn.classList.remove('hidden');
+        // Update header
+        if (statusEl) statusEl.textContent = currentAuthUser.email || 'Logged in';
+        if (roleBadge) {
+            roleBadge.textContent = (currentAuthRole || 'viewer').toUpperCase();
+            roleBadge.classList.remove('hidden');
+            roleBadge.classList.toggle('bg-emerald-100', currentAuthRole === 'editor');
+            roleBadge.classList.toggle('text-emerald-800', currentAuthRole === 'editor');
+            roleBadge.classList.toggle('bg-gray-100', currentAuthRole !== 'editor');
+            roleBadge.classList.toggle('text-gray-700', currentAuthRole !== 'editor');
+        }
+        if (loginBtn) loginBtn.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+
+        // Update sidebar
+        if (sidebarStatus) sidebarStatus.classList.add('hidden');
+        if (sidebarEmail) {
+            sidebarEmail.textContent = currentAuthUser.email || 'Logged in';
+            sidebarEmail.classList.remove('hidden');
+        }
+        if (sidebarRole) {
+            sidebarRole.textContent = (currentAuthRole || 'viewer').toUpperCase();
+            sidebarRole.classList.remove('hidden');
+            sidebarRole.classList.toggle('bg-emerald-100', currentAuthRole === 'editor');
+            sidebarRole.classList.toggle('text-emerald-700', currentAuthRole === 'editor');
+            sidebarRole.classList.toggle('bg-indigo-100', currentAuthRole !== 'editor');
+            sidebarRole.classList.toggle('text-indigo-700', currentAuthRole !== 'editor');
+        }
+        if (sidebarLoginBtn) sidebarLoginBtn.classList.add('hidden');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.classList.remove('hidden');
     } else {
-        statusEl.textContent = 'Not logged in';
-        roleBadge.classList.add('hidden');
-        loginBtn.classList.remove('hidden');
-        logoutBtn.classList.add('hidden');
+        // Update header
+        if (statusEl) statusEl.textContent = 'Not logged in';
+        if (roleBadge) roleBadge.classList.add('hidden');
+        if (loginBtn) loginBtn.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+
+        // Update sidebar
+        if (sidebarStatus) {
+            sidebarStatus.textContent = 'Not logged in';
+            sidebarStatus.classList.remove('hidden');
+        }
+        if (sidebarEmail) sidebarEmail.classList.add('hidden');
+        if (sidebarRole) sidebarRole.classList.add('hidden');
+        if (sidebarLoginBtn) sidebarLoginBtn.classList.remove('hidden');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.classList.add('hidden');
     }
 }
 

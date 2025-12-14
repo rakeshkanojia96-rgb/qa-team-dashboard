@@ -170,51 +170,69 @@
     <div id="app-container" class="flex h-screen">
         <!-- Sidebar Navigation -->
         <aside class="w-64 bg-white shadow-sm border-r border-gray-200 flex flex-col">
-            <nav class="p-4 space-y-2 flex-1">
-                <div class="nav-item active flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('dashboard')">
-                    <i data-lucide="layout-dashboard" width="20" height="20"></i>
-                    <span class="font-medium">Dashboard</span>
+            <nav class="p-4 space-y-1 flex-1 overflow-y-auto">
+                <div class="nav-item active flex items-center space-x-3 p-2.5 rounded-lg" onclick="showSection('dashboard')">
+                    <i data-lucide="layout-dashboard" width="18" height="18"></i>
+                    <span class="font-medium text-sm">Dashboard</span>
                 </div>
-                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('team-members')">
-                    <i data-lucide="users" width="20" height="20"></i>
-                    <span class="font-medium">Team Members</span>
+                <div class="nav-item flex items-center space-x-3 p-2.5 rounded-lg" onclick="showSection('team-members')">
+                    <i data-lucide="users" width="18" height="18"></i>
+                    <span class="font-medium text-sm">Team Members</span>
                 </div>
-                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('performance')">
-                    <i data-lucide="trending-up" width="20" height="20"></i>
-                    <span class="font-medium">Performance Metrics</span>
+                <div class="nav-item flex items-center space-x-3 p-2.5 rounded-lg" onclick="showSection('performance')">
+                    <i data-lucide="trending-up" width="18" height="18"></i>
+                    <span class="font-medium text-sm">Performance</span>
                 </div>
-                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('attendance')">
-                    <i data-lucide="calendar-check" width="20" height="20"></i>
-                    <span class="font-medium">Attendance</span>
+                <div class="nav-item flex items-center space-x-3 p-2.5 rounded-lg" onclick="showSection('attendance')">
+                    <i data-lucide="calendar-check" width="18" height="18"></i>
+                    <span class="font-medium text-sm">Attendance</span>
                 </div>
-                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('holidays')">
-                    <i data-lucide="calendar-x" width="20" height="20"></i>
-                    <span class="font-medium">Holidays & Weekends</span>
+                <div class="nav-item flex items-center space-x-3 p-2.5 rounded-lg" onclick="showSection('holidays')">
+                    <i data-lucide="calendar-x" width="18" height="18"></i>
+                    <span class="font-medium text-sm">Holidays</span>
                 </div>
-                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('appraisal')">
-                    <i data-lucide="star" width="20" height="20"></i>
-                    <span class="font-medium">Appraisal</span>
+                <div class="nav-item flex items-center space-x-3 p-2.5 rounded-lg" onclick="showSection('appraisal')">
+                    <i data-lucide="star" width="18" height="18"></i>
+                    <span class="font-medium text-sm">Appraisal</span>
                 </div>
-                <div class="nav-item flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('analytics')">
-                    <i data-lucide="bar-chart-3" width="20" height="20"></i>
-                    <span class="font-medium">Analytics</span>
+                <div class="nav-item flex items-center space-x-3 p-2.5 rounded-lg" onclick="showSection('analytics')">
+                    <i data-lucide="bar-chart-3" width="18" height="18"></i>
+                    <span class="font-medium text-sm">Analytics</span>
                 </div>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-200 my-2"></div>
+                
+                <!-- Data Management -->
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2.5 mt-3 mb-2">Data</p>
+                <button onclick="showExportMenu()" class="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-gray-100 transition-colors text-left">
+                    <i data-lucide="download" width="18" height="18" class="text-gray-600"></i>
+                    <span class="font-medium text-sm text-gray-700">Export</span>
+                </button>
+                <button onclick="showImportMenu()" class="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-gray-100 transition-colors text-left">
+                    <i data-lucide="upload" width="18" height="18" class="text-gray-600"></i>
+                    <span class="font-medium text-sm text-gray-700">Import</span>
+                </button>
+                <button onclick="downloadCurrentTemplate()" class="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-gray-100 transition-colors text-left">
+                    <i data-lucide="file-text" width="18" height="18" class="text-gray-600"></i>
+                    <span class="font-medium text-sm text-gray-700">Templates</span>
+                </button>
             </nav>
             
-            <!-- Data Management Actions -->
-            <div class="border-t border-gray-200 p-4 space-y-2">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Data Management</p>
-                <button onclick="showExportMenu()" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i data-lucide="download" width="20" height="20" class="text-gray-600"></i>
-                    <span class="font-medium text-gray-700">Export Data</span>
+            <!-- Auth Section (Bottom) -->
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="mb-3">
+                    <div id="sidebar-auth-status" class="text-xs text-gray-500 mb-1">Not logged in</div>
+                    <div id="sidebar-auth-email" class="text-sm font-medium text-gray-700 truncate hidden"></div>
+                    <span id="sidebar-auth-role" class="hidden text-xs px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 inline-block mt-1"></span>
+                </div>
+                <button id="sidebar-login-btn" onclick="openAuthModal()" class="w-full btn-secondary text-sm py-2 flex items-center justify-center space-x-2">
+                    <i data-lucide="log-in" width="16" height="16"></i>
+                    <span>Login</span>
                 </button>
-                <button onclick="showImportMenu()" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i data-lucide="upload" width="20" height="20" class="text-gray-600"></i>
-                    <span class="font-medium text-gray-700">Import Data</span>
-                </button>
-                <button onclick="downloadCurrentTemplate()" class="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i data-lucide="file-text" width="20" height="20" class="text-gray-600"></i>
-                    <span class="font-medium text-gray-700">Templates</span>
+                <button id="sidebar-logout-btn" onclick="logout()" class="w-full btn-secondary text-sm py-2 hidden flex items-center justify-center space-x-2">
+                    <i data-lucide="log-out" width="16" height="16"></i>
+                    <span>Logout</span>
                 </button>
             </div>
         </aside>
