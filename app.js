@@ -270,6 +270,15 @@ async function handleAuthSubmit(e) {
             return;
         }
 
+        // Update auth state immediately
+        currentAuthUser = result.data.user;
+        await ensureProfileRow();
+        await loadCloudDatasetIntoApp();
+        
+        // Update UI
+        setAuthPanelState();
+        applyRolePermissions();
+        
         closeAuthModal();
         showNotification(isAuthSignupMode ? 'Account created. You are logged in.' : 'Logged in successfully.', 'success');
     } catch (err) {
