@@ -950,17 +950,189 @@ function formatPeriod(periodType, period) {
     }
 }
 
+// Performance filter state
+let performanceFilters = {
+    member: '',
+    project: '',
+    periodType: '',
+    dateFrom: '',
+    dateTo: '',
+    minTcCreated: '',
+    minTcExecuted: '',
+    minDefects: ''
+};
+
+// Toggle performance filters panel
+function togglePerformanceFilters() {
+    const filtersPanel = document.getElementById('performance-filters');
+    filtersPanel.classList.toggle('hidden');
+    
+    // Populate filter dropdowns when opening
+    if (!filtersPanel.classList.contains('hidden')) {
+        populatePerformanceFilterDropdowns();
+    }
+    
+    lucide.createIcons();
+}
+
+// Populate filter dropdowns
+function populatePerformanceFilterDropdowns() {
+    // Populate members dropdown
+    const memberSelect = document.getElementById('filter-member');
+    const currentMemberValue = memberSelect.value;
+    memberSelect.innerHTML = '<option value="">All Members</option>';
+    teamMembers.forEach(member => {
+        memberSelect.innerHTML += `<option value="${member.id}">${member.name}</option>`;
+    });
+    memberSelect.value = currentMemberValue;
+    
+    // Populate projects dropdown with unique projects
+    const projectSelect = document.getElementById('filter-project');
+    const currentProjectValue = projectSelect.value;
+    const uniqueProjects = [...new Set(performanceData.map(p => p.projectName).filter(p => p))];
+    projectSelect.innerHTML = '<option value="">All Projects</option>';
+    uniqueProjects.sort().forEach(project => {
+        projectSelect.innerHTML += `<option value="${project}">${project}</option>`;
+    });
+    projectSelect.value = currentProjectValue;
+}
+
+// Apply performance filters
+function applyPerformanceFilters() {
+    // Get filter values
+    performanceFilters.member = document.getElementById('filter-member').value;
+    performanceFilters.project = document.getElementById('filter-project').value;
+    performanceFilters.periodType = document.getElementById('filter-period-type').value;
+    performanceFilters.dateFrom = document.getElementById('filter-date-from').value;
+    performanceFilters.dateTo = document.getElementById('filter-date-to').value;
+    performanceFilters.minTcCreated = document.getElementById('filter-min-tc-created').value;
+    performanceFilters.minTcExecuted = document.getElementById('filter-min-tc-executed').value;
+    performanceFilters.minDefects = document.getElementById('filter-min-defects').value;
+    
+    // Re-render with filters
+    renderPerformanceHistory();
+}
+
+// Clear performance filters
+function clearPerformanceFilters() {
+    // Reset filter values
+    document.getElementById('filter-member').value = '';
+    document.getElementById('filter-project').value = '';
+    document.getElementById('filter-period-type').value = '';
+    document.getElementById('filter-date-from').value = '';
+    document.getElementById('filter-date-to').value = '';
+    document.getElementById('filter-min-tc-created').value = '';
+    document.getElementById('filter-min-tc-executed').value = '';
+    document.getElementById('filter-min-defects').value = '';
+    
+    // Reset filter state
+    performanceFilters = {
+        member: '',
+        project: '',
+        periodType: '',
+        dateFrom: '',
+        dateTo: '',
+        minTcCreated: '',
+        minTcExecuted: '',
+        minDefects: ''
+    };
+    
+    // Re-render without filters
+    renderPerformanceHistory();
+}
+
+// Filter performance data
+function getFilteredPerformanceData() {
+    let filtered = [...performanceData];
+    
+    // Filter by member
+    if (performanceFilters.member) {
+        filtered = filtered.filter(p => p.memberId === performanceFilters.member);
+    }
+    
+    // Filter by project
+    if (performanceFilters.project) {
+        filtered = filtered.filter(p => p.projectName === performanceFilters.project);
+    }
+    
+    // Filter by period type
+    if (performanceFilters.periodType) {
+        filtered = filtered.filter(p => (p.periodType || 'monthly') === performanceFilters.periodType);
+    }
+    
+    // Filter by date range
+    if (performanceFilters.dateFrom || performanceFilters.dateTo) {
+        filtered = filtered.filter(p => {
+            const period = p.period || p.month || '';
+            if (!period) return false;
+            
+            // Convert period to comparable date string
+            let compareDate = period;
+            if (p.periodType === 'weekly' && period.includes(' to ')) {
+                // For weekly, use start date
+                compareDate = period.split(' to ')[0];
+            } else if (p.periodType === 'monthly' && period.length === 7) {
+                // For monthly (YYYY-MM), append -01 for comparison
+                compareDate = period + '-01';
+            }
+            
+            if (performanceFilters.dateFrom && compareDate < performanceFilters.dateFrom) {
+                return false;
+            }
+            if (performanceFilters.dateTo && compareDate > performanceFilters.dateTo) {
+                return false;
+            }
+            return true;
+        });
+    }
+    
+    // Filter by minimum values
+    if (performanceFilters.minTcCreated) {
+        const min = parseInt(performanceFilters.minTcCreated);
+        filtered = filtered.filter(p => (p.testsCreated || 0) >= min);
+    }
+    
+    if (performanceFilters.minTcExecuted) {
+        const min = parseInt(performanceFilters.minTcExecuted);
+        filtered = filtered.filter(p => (p.testsExecuted || 0) >= min);
+    }
+    
+    if (performanceFilters.minDefects) {
+        const min = parseInt(performanceFilters.minDefects);
+        filtered = filtered.filter(p => (p.defectsReported || 0) >= min);
+    }
+    
+    return filtered;
+}
+
 // Render performance history
 function renderPerformanceHistory() {
     const tbody = document.getElementById('performance-table-body');
     
     if (performanceData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">No performance data available</td></tr>';
+        document.getElementById('filter-results-count').textContent = 'No data';
+        return;
+    }
+    
+    // Get filtered data
+    const filteredData = getFilteredPerformanceData();
+    
+    // Update results count
+    const totalCount = performanceData.length;
+    const filteredCount = filteredData.length;
+    const resultsText = filteredCount === totalCount 
+        ? `Showing all ${totalCount} records` 
+        : `Showing ${filteredCount} of ${totalCount} records`;
+    document.getElementById('filter-results-count').textContent = resultsText;
+    
+    if (filteredData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">No records match the selected filters</td></tr>';
         return;
     }
     
     // Sort by date (newest first)
-    const sortedData = [...performanceData].sort((a, b) => {
+    const sortedData = [...filteredData].sort((a, b) => {
         const dateA = a.period || a.month || '';
         const dateB = b.period || b.month || '';
         return dateB.localeCompare(dateA);
@@ -1024,6 +1196,12 @@ function renderPerformanceHistory() {
     }).join('');
     
     lucide.createIcons();
+    
+    // Update filter dropdowns if panel is open
+    const filtersPanel = document.getElementById('performance-filters');
+    if (filtersPanel && !filtersPanel.classList.contains('hidden')) {
+        populatePerformanceFilterDropdowns();
+    }
 }
 
 // Delete performance
