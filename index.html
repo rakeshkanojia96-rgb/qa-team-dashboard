@@ -1063,25 +1063,106 @@
             <div id="analytics-section" class="section hidden">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Team Analytics</h2>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Test Execution Trends</h3>
-                        <canvas id="testTrendsChart"></canvas>
+                <!-- Analytics KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="card stat-card p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Total Test Cases</p>
+                                <h3 class="text-3xl font-bold mt-2" id="analytics-total-tc">0</h3>
+                                <p class="text-white/70 text-xs mt-1" id="analytics-tc-trend">No data</p>
+                            </div>
+                            <i data-lucide="file-check" width="32" height="32" class="text-white/60"></i>
+                        </div>
                     </div>
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Bug Distribution</h3>
-                        <canvas id="bugDistributionChart"></canvas>
+                    
+                    <div class="card stat-card-green p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Avg Execution Rate</p>
+                                <h3 class="text-3xl font-bold mt-2" id="analytics-exec-rate">0%</h3>
+                                <p class="text-white/70 text-xs mt-1" id="analytics-exec-trend">No data</p>
+                            </div>
+                            <i data-lucide="trending-up" width="32" height="32" class="text-white/60"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card-orange p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Total Defects</p>
+                                <h3 class="text-3xl font-bold mt-2" id="analytics-total-defects">0</h3>
+                                <p class="text-white/70 text-xs mt-1" id="analytics-defects-trend">No data</p>
+                            </div>
+                            <i data-lucide="bug" width="32" height="32" class="text-white/60"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card-blue p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-white/80 text-sm font-medium">Active Projects</p>
+                                <h3 class="text-3xl font-bold mt-2" id="analytics-active-projects">0</h3>
+                                <p class="text-white/70 text-xs mt-1" id="analytics-projects-list">No projects</p>
+                            </div>
+                            <i data-lucide="folder" width="32" height="32" class="text-white/60"></i>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Top Performers -->
+                <div class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Top Performers (Last 30 Days)</h3>
+                    <div id="top-performers-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <p class="text-gray-500">No performance data available</p>
+                    </div>
+                </div>
+
+                <!-- Charts Row 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Performance Trends (Last 6 Months)</h3>
+                        <canvas id="testTrendsChart" height="300"></canvas>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Project-wise Test Distribution</h3>
+                        <canvas id="projectDistributionChart" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Charts Row 2 -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="card p-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Team Member Comparison</h3>
-                        <canvas id="memberComparisonChart"></canvas>
+                        <canvas id="memberComparisonChart" height="300"></canvas>
                     </div>
                     <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Attendance Overview</h3>
-                        <canvas id="attendanceChart"></canvas>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Defects vs Test Cases</h3>
+                        <canvas id="defectsVsTestsChart" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Analytics Table -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Member Performance Summary</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total TC Created</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total TC Executed</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Defects</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avg per Month</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quality Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analytics-member-summary" class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1395,6 +1476,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="app.js"></script>
+    <script src="analytics.js"></script>
 </body>
 </html>
