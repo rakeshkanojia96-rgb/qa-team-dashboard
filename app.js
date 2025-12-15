@@ -152,7 +152,21 @@ function setupEventListeners() {
     document.getElementById('attendance-form').addEventListener('submit', handleAddAttendance);
     document.getElementById('goals-form').addEventListener('submit', handleAddGoal);
     document.getElementById('rating-form').addEventListener('submit', handleAddRating);
-    document.getElementById('import-file-input').addEventListener('change', handleImportFile);
+    
+    const fileInput = document.getElementById('import-file-input');
+    console.log('🔧 Setting up import file listener on:', fileInput);
+    if (fileInput) {
+        fileInput.addEventListener('change', handleImportFile);
+        console.log('✅ Import file change listener attached');
+        
+        // Test that the listener works
+        console.log('🧪 Testing if change event would fire...');
+        fileInput.addEventListener('change', (e) => {
+            console.log('🚨 TEST LISTENER: Change event detected!', e.target.files.length, 'files');
+        });
+    } else {
+        console.error('❌ Could not find import-file-input element!');
+    }
 
     const authForm = document.getElementById('auth-form');
     if (authForm) {
@@ -265,6 +279,13 @@ function applyRolePermissions() {
                 }
             });
         });
+        
+        // Explicitly ensure file input is enabled for imports
+        const fileInput = document.getElementById('import-file-input');
+        if (fileInput) {
+            fileInput.disabled = false;
+            console.log('🔓 File input explicitly enabled, disabled:', fileInput.disabled);
+        }
     }, 100);
 }
 
@@ -1741,6 +1762,8 @@ function importCSV(type) {
     currentImportType = type;
     const fileInput = document.getElementById('import-file-input');
     console.log('📁 File input element:', fileInput);
+    console.log('📁 File input disabled?', fileInput?.disabled);
+    console.log('📁 File input display:', fileInput ? window.getComputedStyle(fileInput).display : 'N/A');
     if (!fileInput) {
         console.error('❌ File input element not found!');
         showNotification('Error: File input not found', 'error');
@@ -1748,6 +1771,7 @@ function importCSV(type) {
     }
     fileInput.accept = '.csv,.xlsx,.xls';
     console.log('🖱️ Triggering file dialog with accept:', fileInput.accept);
+    console.log('🔍 Checking event listeners on file input...');
     fileInput.click();
     console.log('✅ File dialog triggered');
     // Close modal after a short delay to allow file dialog to open
