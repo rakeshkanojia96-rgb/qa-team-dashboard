@@ -314,8 +314,13 @@
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Performance Metrics</h2>
                 
                 <div class="card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Add Performance Data</h3>
-                    <form id="performance-form" class="space-y-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Add Performance Data</h3>
+                        <button type="button" onclick="toggleSection('add-performance-form')" class="text-gray-600 hover:text-gray-900">
+                            <i id="add-performance-form-icon" data-lucide="chevron-down" width="24" height="24"></i>
+                        </button>
+                    </div>
+                    <form id="performance-form" class="space-y-4 hidden" data-collapsible="add-performance-form">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Member <span class="text-red-500">*</span></label>
@@ -493,8 +498,13 @@
 
                 <!-- Single Day Attendance Form -->
                 <div id="single-attendance-form" class="card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Mark Attendance (Single Day)</h3>
-                    <form id="attendance-form" class="space-y-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Mark Attendance (Single Day)</h3>
+                        <button type="button" onclick="toggleSection('single-attendance-content')" class="text-gray-600 hover:text-gray-900">
+                            <i id="single-attendance-content-icon" data-lucide="chevron-down" width="24" height="24"></i>
+                        </button>
+                    </div>
+                    <form id="attendance-form" class="space-y-4 hidden" data-collapsible="single-attendance-content">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Member</label>
@@ -533,13 +543,18 @@
                 <!-- Bulk Attendance Form -->
                 <div id="bulk-attendance-form" class="card p-6 mb-6 hidden">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold text-gray-900">Bulk Mark Attendance</h3>
-                        <p class="text-xs text-gray-500">
-                            <i data-lucide="info" width="14" height="14" class="inline"></i>
-                            Weekends (Sat & Sun) are automatically excluded
-                        </p>
+                        <div class="flex items-center space-x-3">
+                            <h3 class="text-xl font-bold text-gray-900">Bulk Mark Attendance</h3>
+                            <p class="text-xs text-gray-500">
+                                <i data-lucide="info" width="14" height="14" class="inline"></i>
+                                Weekends (Sat & Sun) are automatically excluded
+                            </p>
+                        </div>
+                        <button type="button" onclick="toggleSection('bulk-attendance-content')" class="text-gray-600 hover:text-gray-900">
+                            <i id="bulk-attendance-content-icon" data-lucide="chevron-down" width="24" height="24"></i>
+                        </button>
                     </div>
-                    <form id="bulk-attendance-form-element" class="space-y-4">
+                    <form id="bulk-attendance-form-element" class="space-y-4 hidden" data-collapsible="bulk-attendance-content">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Select Team Members</label>
@@ -721,8 +736,13 @@
 
                 <!-- Bulk Edit Attendance -->
                 <div class="card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Bulk Edit Attendance</h3>
-                    <form id="bulk-edit-attendance-form" class="space-y-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Bulk Edit Attendance</h3>
+                        <button type="button" onclick="toggleSection('bulk-edit-attendance-content')" class="text-gray-600 hover:text-gray-900">
+                            <i id="bulk-edit-attendance-content-icon" data-lucide="chevron-down" width="24" height="24"></i>
+                        </button>
+                    </div>
+                    <form id="bulk-edit-attendance-form" class="space-y-4 hidden" data-collapsible="bulk-edit-attendance-content">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <div class="flex items-center justify-between mb-2">

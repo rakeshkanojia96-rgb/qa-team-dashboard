@@ -589,6 +589,23 @@ async function saveCloudDataset() {
     }
 }
 
+// Toggle collapsible sections
+function toggleSection(sectionId) {
+    const elements = document.querySelectorAll(`[data-collapsible="${sectionId}"]`);
+    const icon = document.getElementById(`${sectionId}-icon`);
+    
+    elements.forEach(element => {
+        element.classList.toggle('hidden');
+    });
+    
+    // Toggle icon between chevron-down and chevron-up
+    if (icon) {
+        const isHidden = elements[0]?.classList.contains('hidden');
+        icon.setAttribute('data-lucide', isHidden ? 'chevron-down' : 'chevron-up');
+        lucide.createIcons();
+    }
+}
+
 // Navigation
 function showSection(sectionName) {
     // Save current section to localStorage
