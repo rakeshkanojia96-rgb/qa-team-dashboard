@@ -1746,6 +1746,17 @@ function importJSON() {
         showNotification('Error: File input not found', 'error');
         return;
     }
+    
+    // Attach fresh listener right before click to ensure it's active
+    const handleChange = (e) => {
+        console.log('🎯 DIRECT LISTENER: Change fired!', e.target.files.length, 'files');
+        handleImportFile(e);
+        // Remove this one-time listener
+        fileInput.removeEventListener('change', handleChange);
+    };
+    fileInput.addEventListener('change', handleChange);
+    console.log('🎯 Fresh change listener attached');
+    
     fileInput.accept = '.json';
     console.log('🖱️ Triggering file dialog...');
     fileInput.click();
@@ -1769,6 +1780,17 @@ function importCSV(type) {
         showNotification('Error: File input not found', 'error');
         return;
     }
+    
+    // Attach fresh listener right before click to ensure it's active
+    const handleChange = (e) => {
+        console.log('🎯 DIRECT LISTENER: Change fired!', e.target.files.length, 'files');
+        handleImportFile(e);
+        // Remove this one-time listener
+        fileInput.removeEventListener('change', handleChange);
+    };
+    fileInput.addEventListener('change', handleChange);
+    console.log('🎯 Fresh change listener attached');
+    
     fileInput.accept = '.csv,.xlsx,.xls';
     console.log('🖱️ Triggering file dialog with accept:', fileInput.accept);
     console.log('🔍 Checking event listeners on file input...');
