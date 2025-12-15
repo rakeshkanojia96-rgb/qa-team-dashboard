@@ -979,6 +979,23 @@ let performanceFilters = {
     minDefects: ''
 };
 
+// Performance pagination state
+let performanceCurrentPage = 1;
+let performancePageSize = 10;
+
+// Change performance page size
+function changePerformancePageSize() {
+    performancePageSize = parseInt(document.getElementById('performance-page-size').value);
+    performanceCurrentPage = 1;
+    renderPerformanceHistory();
+}
+
+// Go to performance page
+function goToPerformancePage(page) {
+    performanceCurrentPage = page;
+    renderPerformanceHistory();
+}
+
 // Toggle performance filters panel
 function togglePerformanceFilters() {
     const filtersPanel = document.getElementById('performance-filters');
@@ -1125,26 +1142,34 @@ function getFilteredPerformanceData() {
 // Render performance history
 function renderPerformanceHistory() {
     const tbody = document.getElementById('performance-table-body');
+    const pageInfo = document.getElementById('performance-page-info');
+    const pagination = document.getElementById('performance-pagination');
     
     if (performanceData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">No performance data available</td></tr>';
-        document.getElementById('filter-results-count').textContent = 'No data';
+        const filterCount = document.getElementById('filter-results-count');
+        if (filterCount) filterCount.textContent = 'No data';
+        if (pageInfo) pageInfo.textContent = 'Showing 0 of 0 entries';
+        if (pagination) pagination.innerHTML = '';
         return;
     }
     
     // Get filtered data
     const filteredData = getFilteredPerformanceData();
     
-    // Update results count
+    // Update results count (for filters)
     const totalCount = performanceData.length;
     const filteredCount = filteredData.length;
     const resultsText = filteredCount === totalCount 
         ? `Showing all ${totalCount} records` 
         : `Showing ${filteredCount} of ${totalCount} records`;
-    document.getElementById('filter-results-count').textContent = resultsText;
+    const filterCount = document.getElementById('filter-results-count');
+    if (filterCount) filterCount.textContent = resultsText;
     
     if (filteredData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="px-6 py-4 text-center text-gray-500">No records match the selected filters</td></tr>';
+        if (pageInfo) pageInfo.textContent = 'Showing 0 of 0 entries';
+        if (pagination) pagination.innerHTML = '';
         return;
     }
     
@@ -1155,7 +1180,19 @@ function renderPerformanceHistory() {
         return dateB.localeCompare(dateA);
     });
     
-    tbody.innerHTML = sortedData.map(perf => {
+    // Calculate pagination
+    const totalRecords = sortedData.length;
+    const totalPages = Math.ceil(totalRecords / performancePageSize);
+    const startIndex = (performanceCurrentPage - 1) * performancePageSize;
+    const endIndex = Math.min(startIndex + performancePageSize, totalRecords);
+    const paginatedData = sortedData.slice(startIndex, endIndex);
+    
+    // Update page info
+    if (pageInfo) {
+        pageInfo.textContent = `Showing ${startIndex + 1}-${endIndex} of ${totalRecords} entries`;
+    }
+    
+    tbody.innerHTML = paginatedData.map(perf => {
         const member = teamMembers.find(m => m.id === perf.memberId);
         const periodType = perf.periodType || 'monthly'; // Default to monthly for legacy data
         const period = perf.period || perf.month; // Support legacy 'month' field
@@ -1212,6 +1249,51 @@ function renderPerformanceHistory() {
         `;
     }).join('');
     
+    // Render pagination buttons
+    if (pagination && totalPages > 1) {
+        let paginationHTML = '';
+        
+        // Previous button
+        paginationHTML += `
+            <button onclick="goToPerformancePage(${performanceCurrentPage - 1})" 
+                    class="px-3 py-1 border rounded-lg ${performanceCurrentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}" 
+                    ${performanceCurrentPage === 1 ? 'disabled' : ''}>
+                Previous
+            </button>
+        `;
+        
+        // Page numbers
+        const maxPagesToShow = 5;
+        let startPage = Math.max(1, performanceCurrentPage - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+        
+        if (endPage - startPage < maxPagesToShow - 1) {
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button onclick="goToPerformancePage(${i})" 
+                        class="px-3 py-1 border rounded-lg ${i === performanceCurrentPage ? 'bg-indigo-600 text-white' : 'hover:bg-gray-100'}">
+                    ${i}
+                </button>
+            `;
+        }
+        
+        // Next button
+        paginationHTML += `
+            <button onclick="goToPerformancePage(${performanceCurrentPage + 1})" 
+                    class="px-3 py-1 border rounded-lg ${performanceCurrentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}" 
+                    ${performanceCurrentPage === totalPages ? 'disabled' : ''}>
+                Next
+            </button>
+        `;
+        
+        pagination.innerHTML = paginationHTML;
+    } else if (pagination) {
+        pagination.innerHTML = '';
+    }
+    
     lucide.createIcons();
     
     // Update filter dropdowns if panel is open
@@ -1263,18 +1345,51 @@ function handleAddAttendance(e) {
     showNotification('Attendance marked successfully!', 'success');
 }
 
+// Attendance pagination state
+let attendanceCurrentPage = 1;
+let attendancePageSize = 10;
+
+// Change attendance page size
+function changeAttendancePageSize() {
+    attendancePageSize = parseInt(document.getElementById('attendance-page-size').value);
+    attendanceCurrentPage = 1;
+    renderAttendanceHistory();
+}
+
+// Go to attendance page
+function goToAttendancePage(page) {
+    attendanceCurrentPage = page;
+    renderAttendanceHistory();
+}
+
 // Render attendance history
 function renderAttendanceHistory() {
     const tbody = document.getElementById('attendance-table-body');
+    const pageInfo = document.getElementById('attendance-page-info');
+    const pagination = document.getElementById('attendance-pagination');
     
     if (attendanceData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No attendance records available</td></tr>';
+        if (pageInfo) pageInfo.textContent = 'Showing 0 of 0 entries';
+        if (pagination) pagination.innerHTML = '';
         return;
     }
     
     const sortedAttendance = [...attendanceData].sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    tbody.innerHTML = sortedAttendance.slice(0, 50).map(att => {
+    // Calculate pagination
+    const totalRecords = sortedAttendance.length;
+    const totalPages = Math.ceil(totalRecords / attendancePageSize);
+    const startIndex = (attendanceCurrentPage - 1) * attendancePageSize;
+    const endIndex = Math.min(startIndex + attendancePageSize, totalRecords);
+    const paginatedData = sortedAttendance.slice(startIndex, endIndex);
+    
+    // Update page info
+    if (pageInfo) {
+        pageInfo.textContent = `Showing ${startIndex + 1}-${endIndex} of ${totalRecords} entries`;
+    }
+    
+    tbody.innerHTML = paginatedData.map(att => {
         const member = teamMembers.find(m => m.id === att.memberId);
         return `
             <tr>
@@ -1306,7 +1421,52 @@ function renderAttendanceHistory() {
             </tr>
         `;
     }).join('');
-    
+
+    // Render pagination buttons
+    if (pagination && totalPages > 1) {
+        let paginationHTML = '';
+
+        // Previous button
+        paginationHTML += `
+            <button onclick="goToAttendancePage(${attendanceCurrentPage - 1})" 
+                    class="px-3 py-1 border rounded-lg ${attendanceCurrentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}" 
+                    ${attendanceCurrentPage === 1 ? 'disabled' : ''}>
+                Previous
+            </button>
+        `;
+
+        // Page numbers
+        const maxPagesToShow = 5;
+        let startPage = Math.max(1, attendanceCurrentPage - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+        if (endPage - startPage < maxPagesToShow - 1) {
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <button onclick="goToAttendancePage(${i})" 
+                        class="px-3 py-1 border rounded-lg ${i === attendanceCurrentPage ? 'bg-indigo-600 text-white' : 'hover:bg-gray-100'}">
+                    ${i}
+                </button>
+            `;
+        }
+
+        // Next button
+        paginationHTML += `
+            <button onclick="goToAttendancePage(${attendanceCurrentPage + 1})" 
+                    class="px-3 py-1 border rounded-lg ${attendanceCurrentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}" 
+                    ${attendanceCurrentPage === totalPages ? 'disabled' : ''}>
+                Next
+            </button>
+        `;
+
+        pagination.innerHTML = paginationHTML;
+    } else if (pagination) {
+        pagination.innerHTML = '';
+    }
+
     lucide.createIcons();
 }
 

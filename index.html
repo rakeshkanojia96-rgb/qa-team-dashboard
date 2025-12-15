@@ -281,9 +281,16 @@
 
                 <!-- Team Members Quick View -->
                 <div class="card p-6 mb-8">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Team Members</h3>
-                    <div id="team-members-list" class="space-y-3">
-                        <p class="text-gray-500">No team members added yet. Go to Team Members section to add.</p>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Team Members</h3>
+                        <button type="button" onclick="toggleSection('dashboard-team-members-content')" class="text-gray-600 hover:text-gray-900">
+                            <i id="dashboard-team-members-content-icon" data-lucide="chevron-down" width="24" height="24"></i>
+                        </button>
+                    </div>
+                    <div class="hidden" data-collapsible="dashboard-team-members-content">
+                        <div id="team-members-list" class="space-y-3">
+                            <p class="text-gray-500">No team members added yet. Go to Team Members section to add.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -377,11 +384,19 @@
                 <div class="card p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold text-gray-900">Performance History</h3>
-                        <button onclick="togglePerformanceFilters()" class="btn-secondary text-sm flex items-center">
-                            <i data-lucide="filter" width="16" height="16" class="mr-2"></i>
-                            Filters
-                        </button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="togglePerformanceFilters()" class="btn-secondary text-sm flex items-center">
+                                <i data-lucide="filter" width="16" height="16" class="mr-2"></i>
+                                Filters
+                            </button>
+                            <button type="button" onclick="toggleSection('performance-history-content')" class="text-gray-600 hover:text-gray-900">
+                                <i id="performance-history-content-icon" data-lucide="chevron-down" width="24" height="24"></i>
+                            </button>
+                        </div>
                     </div>
+                    
+                    <!-- Collapse/Expand Content -->
+                    <div class="hidden" data-collapsible="performance-history-content">
                     
                     <!-- Filters Panel -->
                     <div id="performance-filters" class="hidden mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -455,7 +470,25 @@
                         </div>
                     </div>
                     
-                    <div id="performance-history" class="overflow-x-auto">
+                    <!-- Pagination Controls -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-600">Show:</span>
+                            <select id="performance-page-size" onchange="changePerformancePageSize()" class="px-3 py-1 border border-gray-300 rounded-lg text-sm">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span class="text-sm text-gray-600">entries</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span id="performance-page-info">Showing 0 of 0 entries</span>
+                        </div>
+                    </div>
+                    
+                    <div id="performance-history" class="overflow-x-auto mb-4">
                         <table class="min-w-full">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -477,6 +510,13 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Pagination Buttons -->
+                    <div id="performance-pagination" class="flex justify-center space-x-2">
+                        <!-- Pagination buttons will be added here -->
+                    </div>
+                    
+                    </div><!-- End collapsible content -->
                 </div>
             </div>
 
@@ -793,27 +833,58 @@
                 </div>
 
                 <div class="card p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Attendance Summary</h3>
-                    <div id="attendance-summary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <!-- Summary cards will be added here -->
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">Attendance Summary</h3>
+                        <button type="button" onclick="toggleSection('attendance-logs-content')" class="text-gray-600 hover:text-gray-900">
+                            <i id="attendance-logs-content-icon" data-lucide="chevron-down" width="24" height="24"></i>
+                        </button>
                     </div>
-                    <div id="attendance-history" class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendance-table-body" class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No attendance records available</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="hidden" data-collapsible="attendance-logs-content">
+                        <div id="attendance-summary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <!-- Summary cards will be added here -->
+                        </div>
+                        
+                        <!-- Pagination Controls -->
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-600">Show:</span>
+                                <select id="attendance-page-size" onchange="changeAttendancePageSize()" class="px-3 py-1 border border-gray-300 rounded-lg text-sm">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="text-sm text-gray-600">entries</span>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <span id="attendance-page-info">Showing 0 of 0 entries</span>
+                            </div>
+                        </div>
+                        
+                        <div id="attendance-history" class="overflow-x-auto mb-4">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-table-body" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No attendance records available</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination Buttons -->
+                        <div id="attendance-pagination" class="flex justify-center space-x-2">
+                            <!-- Pagination buttons will be added here -->
+                        </div>
                     </div>
                 </div>
             </div>
