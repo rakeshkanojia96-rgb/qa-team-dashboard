@@ -1640,6 +1640,16 @@ function closeImportMenu() {
     document.getElementById('import-menu-modal').classList.add('hidden');
 }
 
+// Show/Hide Template Menu
+function showTemplateMenu() {
+    document.getElementById('template-menu-modal').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+function closeTemplateMenu() {
+    document.getElementById('template-menu-modal').classList.add('hidden');
+}
+
 // Export as JSON
 function exportAsJSON() {
     const data = {
@@ -1715,18 +1725,27 @@ function importCSV(type) {
 
 // Handle import file
 function handleImportFile(e) {
+    console.log('📂 Import file handler triggered');
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file) {
+        console.log('⚠️ No file selected');
+        return;
+    }
     
+    console.log('📄 File selected:', file.name, 'Type:', currentImportType);
     const fileExtension = file.name.split('.').pop().toLowerCase();
     
     if (currentImportType === 'json') {
+        console.log('📋 Processing as JSON');
         handleJSONImport(file);
     } else if (fileExtension === 'csv') {
+        console.log('📊 Processing as CSV');
         handleCSVImport(file, currentImportType);
     } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+        console.log('📈 Processing as Excel');
         handleExcelImport(file, currentImportType);
     } else {
+        console.log('❌ Unsupported format:', fileExtension);
         showNotification('Unsupported file format!', 'error');
     }
     
@@ -2689,10 +2708,9 @@ function updatePageActions(sectionId) {
     lucide.createIcons();
 }
 
-// Download current page template
-function downloadCurrentTemplate() {
-    const templateBtn = document.getElementById('template-btn');
-    const type = templateBtn.getAttribute('data-type');
+// Download template
+function downloadTemplate(type) {
+    console.log('📥 Downloading template:', type);
     
     if (type === 'members') {
         const csv = 'ID,Name,Email,Role,Joining Date\n' +
@@ -2713,6 +2731,7 @@ function downloadCurrentTemplate() {
         downloadFile(new Blob([csv], { type: 'text/csv' }), 'template-attendance.csv');
     }
     
+    closeTemplateMenu();
     showNotification('Template downloaded!', 'success');
 }
 
