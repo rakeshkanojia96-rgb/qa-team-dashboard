@@ -1739,68 +1739,68 @@ let currentImportType = '';
 function importJSON() {
     console.log('📥 importJSON called');
     currentImportType = 'json';
-    const fileInput = document.getElementById('import-file-input');
-    console.log('📁 File input element:', fileInput);
-    if (!fileInput) {
-        console.error('❌ File input element not found!');
-        showNotification('Error: File input not found', 'error');
-        return;
-    }
     
-    // Attach fresh listener right before click to ensure it's active
-    const handleChange = (e) => {
-        console.log('🎯 DIRECT LISTENER: Change fired!', e.target.files.length, 'files');
-        handleImportFile(e);
-        // Remove this one-time listener
-        fileInput.removeEventListener('change', handleChange);
-    };
-    fileInput.addEventListener('change', handleChange);
-    console.log('🎯 Fresh change listener attached');
+    // Close modal first
+    closeImportMenu();
+    console.log('✅ Import menu closed immediately');
     
+    // Create a completely fresh file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
     fileInput.accept = '.json';
-    console.log('🖱️ Triggering file dialog...');
+    fileInput.style.display = 'none';
+    
+    // Attach listener
+    fileInput.addEventListener('change', (e) => {
+        console.log('🎯 FRESH INPUT: Change fired!', e.target.files.length, 'files');
+        if (e.target.files.length > 0) {
+            handleImportFile(e);
+        }
+        // Remove the temporary input
+        document.body.removeChild(fileInput);
+    });
+    
+    // Add to DOM temporarily
+    document.body.appendChild(fileInput);
+    console.log('✅ Fresh file input created and added to DOM');
+    
+    // Trigger click
     fileInput.click();
-    // Close modal after a short delay to allow file dialog to open
-    setTimeout(() => {
-        closeImportMenu();
-        console.log('✅ Import menu closed');
-    }, 100);
+    console.log('✅ File dialog triggered on fresh input');
 }
 
 // Import CSV
 function importCSV(type) {
     console.log('📥 importCSV called with type:', type);
     currentImportType = type;
-    const fileInput = document.getElementById('import-file-input');
-    console.log('📁 File input element:', fileInput);
-    console.log('📁 File input disabled?', fileInput?.disabled);
-    console.log('📁 File input display:', fileInput ? window.getComputedStyle(fileInput).display : 'N/A');
-    if (!fileInput) {
-        console.error('❌ File input element not found!');
-        showNotification('Error: File input not found', 'error');
-        return;
-    }
     
-    // Attach fresh listener right before click to ensure it's active
-    const handleChange = (e) => {
-        console.log('🎯 DIRECT LISTENER: Change fired!', e.target.files.length, 'files');
-        handleImportFile(e);
-        // Remove this one-time listener
-        fileInput.removeEventListener('change', handleChange);
-    };
-    fileInput.addEventListener('change', handleChange);
-    console.log('🎯 Fresh change listener attached');
+    // Close modal first
+    closeImportMenu();
+    console.log('✅ Import menu closed immediately');
     
+    // Create a completely fresh file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
     fileInput.accept = '.csv,.xlsx,.xls';
-    console.log('🖱️ Triggering file dialog with accept:', fileInput.accept);
-    console.log('🔍 Checking event listeners on file input...');
+    fileInput.style.display = 'none';
+    
+    // Attach listener
+    fileInput.addEventListener('change', (e) => {
+        console.log('🎯 FRESH INPUT: Change fired!', e.target.files.length, 'files');
+        if (e.target.files.length > 0) {
+            handleImportFile(e);
+        }
+        // Remove the temporary input
+        document.body.removeChild(fileInput);
+    });
+    
+    // Add to DOM temporarily
+    document.body.appendChild(fileInput);
+    console.log('✅ Fresh file input created and added to DOM');
+    
+    // Trigger click
     fileInput.click();
-    console.log('✅ File dialog triggered');
-    // Close modal after a short delay to allow file dialog to open
-    setTimeout(() => {
-        closeImportMenu();
-        console.log('✅ Import menu closed');
-    }, 100);
+    console.log('✅ File dialog triggered on fresh input');
 }
 
 // Handle import file
