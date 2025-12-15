@@ -1632,7 +1632,14 @@ function closeExportMenu() {
 
 // Show/Hide Import Menu
 function showImportMenu() {
-    document.getElementById('import-menu-modal').classList.remove('hidden');
+    console.log('📋 showImportMenu called');
+    const modal = document.getElementById('import-menu-modal');
+    if (!modal) {
+        console.error('❌ Import menu modal not found!');
+        return;
+    }
+    modal.classList.remove('hidden');
+    console.log('✅ Import menu shown');
     lucide.createIcons();
 }
 
@@ -1709,17 +1716,36 @@ function exportAsCSV(type) {
 let currentImportType = '';
 
 function importJSON() {
+    console.log('📥 importJSON called');
     currentImportType = 'json';
-    document.getElementById('import-file-input').accept = '.json';
-    document.getElementById('import-file-input').click();
+    const fileInput = document.getElementById('import-file-input');
+    console.log('📁 File input element:', fileInput);
+    if (!fileInput) {
+        console.error('❌ File input element not found!');
+        showNotification('Error: File input not found', 'error');
+        return;
+    }
+    fileInput.accept = '.json';
+    console.log('🖱️ Triggering file dialog...');
+    fileInput.click();
     closeImportMenu();
 }
 
 // Import CSV
 function importCSV(type) {
+    console.log('📥 importCSV called with type:', type);
     currentImportType = type;
-    document.getElementById('import-file-input').accept = '.csv,.xlsx,.xls';
-    document.getElementById('import-file-input').click();
+    const fileInput = document.getElementById('import-file-input');
+    console.log('📁 File input element:', fileInput);
+    if (!fileInput) {
+        console.error('❌ File input element not found!');
+        showNotification('Error: File input not found', 'error');
+        return;
+    }
+    fileInput.accept = '.csv,.xlsx,.xls';
+    console.log('🖱️ Triggering file dialog with accept:', fileInput.accept);
+    fileInput.click();
+    console.log('✅ File dialog triggered');
     closeImportMenu();
 }
 
