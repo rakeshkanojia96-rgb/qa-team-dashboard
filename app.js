@@ -1728,7 +1728,8 @@ function importJSON() {
     fileInput.accept = '.json';
     console.log('🖱️ Triggering file dialog...');
     fileInput.click();
-    closeImportMenu();
+    // Don't close menu immediately - it blocks file dialog
+    // Will close after file is selected in handleImportFile
 }
 
 // Import CSV
@@ -1746,15 +1747,20 @@ function importCSV(type) {
     console.log('🖱️ Triggering file dialog with accept:', fileInput.accept);
     fileInput.click();
     console.log('✅ File dialog triggered');
-    closeImportMenu();
+    // Don't close menu immediately - it blocks file dialog
+    // Will close after file is selected in handleImportFile
 }
 
 // Handle import file
 function handleImportFile(e) {
     console.log('📂 Import file handler triggered');
+    
+    // Close import menu now that user interacted with file dialog
+    closeImportMenu();
+    
     const file = e.target.files[0];
     if (!file) {
-        console.log('⚠️ No file selected');
+        console.log('⚠️ No file selected (user cancelled)');
         return;
     }
     
