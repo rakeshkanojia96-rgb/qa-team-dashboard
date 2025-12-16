@@ -252,7 +252,7 @@
                             <option value="365">Last Year</option>
                             <option value="custom">Custom Range</option>
                         </select>
-                        <div id="dashboard-custom-dates" class="hidden flex items-center space-x-2">
+                        <div id="dashboard-custom-dates" class="items-center space-x-2" style="display: none;">
                             <input type="date" id="dashboard-date-from" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyDashboardDateFilter()">
                             <span class="text-gray-500">to</span>
                             <input type="date" id="dashboard-date-to" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyDashboardDateFilter()">
@@ -1106,7 +1106,7 @@
                             <option value="365">Last Year</option>
                             <option value="custom">Custom Range</option>
                         </select>
-                        <div id="analytics-custom-dates" class="hidden flex items-center space-x-2">
+                        <div id="analytics-custom-dates" class="items-center space-x-2" style="display: none;">
                             <input type="date" id="analytics-date-from" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyAnalyticsDateFilter()">
                             <span class="text-gray-500">to</span>
                             <input type="date" id="analytics-date-to" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyAnalyticsDateFilter()">
@@ -1176,11 +1176,15 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="card p-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Performance Trends (Last 6 Months)</h3>
-                        <canvas id="testTrendsChart" height="300"></canvas>
+                        <div style="height: 250px;">
+                            <canvas id="testTrendsChart"></canvas>
+                        </div>
                     </div>
                     <div class="card p-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Project-wise Test Distribution</h3>
-                        <canvas id="projectDistributionChart" height="300"></canvas>
+                        <div style="height: 250px;">
+                            <canvas id="projectDistributionChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -1188,11 +1192,15 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="card p-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Team Member Comparison</h3>
-                        <canvas id="memberComparisonChart" height="300"></canvas>
+                        <div style="height: 250px;">
+                            <canvas id="memberComparisonChart"></canvas>
+                        </div>
                     </div>
                     <div class="card p-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Defects vs Test Cases</h3>
-                        <canvas id="defectsVsTestsChart" height="300"></canvas>
+                        <div style="height: 250px;">
+                            <canvas id="defectsVsTestsChart"></canvas>
+                        </div>
                     </div>
                 </div>
 

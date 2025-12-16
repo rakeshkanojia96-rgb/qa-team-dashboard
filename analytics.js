@@ -15,11 +15,11 @@ function applyAnalyticsDateFilter() {
     analyticsDateFilter.preset = preset;
     
     if (preset === 'custom') {
-        customDates.classList.remove('hidden');
+        customDates.style.display = 'flex';
         analyticsDateFilter.fromDate = document.getElementById('analytics-date-from').value;
         analyticsDateFilter.toDate = document.getElementById('analytics-date-to').value;
     } else {
-        customDates.classList.add('hidden');
+        customDates.style.display = 'none';
         
         if (preset === 'all') {
             analyticsDateFilter.fromDate = null;
@@ -43,7 +43,7 @@ function clearAnalyticsDateFilter() {
     document.getElementById('analytics-date-preset').value = '30';
     document.getElementById('analytics-date-from').value = '';
     document.getElementById('analytics-date-to').value = '';
-    document.getElementById('analytics-custom-dates').classList.add('hidden');
+    document.getElementById('analytics-custom-dates').style.display = 'none';
     
     const toDate = new Date();
     const fromDate = new Date();

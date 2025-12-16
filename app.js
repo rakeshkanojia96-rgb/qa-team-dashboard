@@ -1702,11 +1702,11 @@ function applyDashboardDateFilter() {
     dashboardDateFilter.preset = preset;
     
     if (preset === 'custom') {
-        customDates.classList.remove('hidden');
+        customDates.style.display = 'flex';
         dashboardDateFilter.fromDate = document.getElementById('dashboard-date-from').value;
         dashboardDateFilter.toDate = document.getElementById('dashboard-date-to').value;
     } else {
-        customDates.classList.add('hidden');
+        customDates.style.display = 'none';
         
         if (preset === 'all') {
             dashboardDateFilter.fromDate = null;
@@ -1730,7 +1730,7 @@ function clearDashboardDateFilter() {
     document.getElementById('dashboard-date-preset').value = '30';
     document.getElementById('dashboard-date-from').value = '';
     document.getElementById('dashboard-date-to').value = '';
-    document.getElementById('dashboard-custom-dates').classList.add('hidden');
+    document.getElementById('dashboard-custom-dates').style.display = 'none';
     
     const toDate = new Date();
     const fromDate = new Date();
