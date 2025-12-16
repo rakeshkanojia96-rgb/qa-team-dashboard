@@ -277,9 +277,9 @@ table th {
     transform: translateY(8px);
     background: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 400;
     white-space: normal;
     width: max-content;
