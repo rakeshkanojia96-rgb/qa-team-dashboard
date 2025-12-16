@@ -155,11 +155,11 @@ function renderTopPerformers() {
         memberStats[perf.memberId].records++;
     });
 
-    // Calculate scores and sort
+    // Calculate scores and sort (QA-Focused: Creation 20%, Execution 40%, Defects 40%)
     const performers = Object.entries(memberStats)
         .map(([memberId, stats]) => {
             const member = teamMembers.find(m => m.id === memberId);
-            const score = (stats.testsCreated * 0.3) + (stats.testsExecuted * 0.4) + (stats.defectsReported * 0.3);
+            const score = (stats.testsCreated * 0.2) + (stats.testsExecuted * 0.4) + (stats.defectsReported * 0.4);
             return { member, stats, score };
         })
         .filter(p => p.member)
