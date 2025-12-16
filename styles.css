@@ -274,35 +274,53 @@ table th {
 .info-tooltip:hover::after {
     content: attr(data-tooltip);
     position: fixed;
-    left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    background: rgba(0, 0, 0, 0.95);
+    transform: translateY(8px);
+    background: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
     font-weight: 400;
     white-space: normal;
     width: max-content;
-    max-width: 320px;
+    max-width: 280px;
     z-index: 9999;
     text-align: left;
-    line-height: 1.5;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     pointer-events: none;
     margin-top: 20px;
+    /* Default: center below icon */
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+}
+
+/* For rightmost column, align tooltip to the right edge to prevent cutoff */
+th:last-child .info-tooltip:hover::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(8px);
 }
 
 .info-tooltip:hover::before {
     content: '';
     position: fixed;
-    left: 50%;
-    transform: translateX(-50%) translateY(2px);
-    border: 8px solid transparent;
-    border-bottom-color: rgba(0, 0, 0, 0.95);
+    transform: translateY(2px);
+    border: 6px solid transparent;
+    border-bottom-color: rgba(0, 0, 0, 0.9);
     z-index: 9999;
     pointer-events: none;
     margin-top: 12px;
+    /* Default: center */
+    left: 50%;
+    transform: translateX(-50%) translateY(2px);
+}
+
+/* Arrow for rightmost column */
+th:last-child .info-tooltip:hover::before {
+    left: auto;
+    right: 8px;
+    transform: translateX(0) translateY(2px);
 }
 
 /* Print Styles */
