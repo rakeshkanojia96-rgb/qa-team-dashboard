@@ -255,6 +255,19 @@ table th {
     position: relative;
     display: inline-flex;
     cursor: help;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 50%;
+    padding: 2px;
+    transition: all 0.2s ease;
+}
+
+.info-tooltip:hover {
+    background: rgba(99, 102, 241, 0.2);
+    transform: scale(1.1);
+}
+
+.info-tooltip i {
+    display: block;
 }
 
 .info-tooltip:hover::after {
