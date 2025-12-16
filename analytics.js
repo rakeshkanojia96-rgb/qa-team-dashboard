@@ -18,6 +18,11 @@ function applyAnalyticsDateFilter() {
         customDates.style.display = 'flex';
         analyticsDateFilter.fromDate = document.getElementById('analytics-date-from').value;
         analyticsDateFilter.toDate = document.getElementById('analytics-date-to').value;
+        
+        // Only render if both dates are selected
+        if (!analyticsDateFilter.fromDate || !analyticsDateFilter.toDate) {
+            return;
+        }
     } else {
         customDates.style.display = 'none';
         
