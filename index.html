@@ -1181,9 +1181,9 @@
                         </div>
                     </div>
                     <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Project-wise Test Distribution</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Team Member Comparison</h3>
                         <div style="height: 250px;">
-                            <canvas id="projectDistributionChart"></canvas>
+                            <canvas id="memberComparisonChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1191,15 +1191,31 @@
                 <!-- Charts Row 2 -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Team Member Comparison</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Project-wise Test Cases Distribution</h3>
                         <div style="height: 250px;">
-                            <canvas id="memberComparisonChart"></canvas>
+                            <canvas id="projectTestCasesChart"></canvas>
                         </div>
                     </div>
                     <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Defects vs Test Cases</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Project-wise Test Execution</h3>
                         <div style="height: 250px;">
-                            <canvas id="defectsVsTestsChart"></canvas>
+                            <canvas id="projectExecutionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 3 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Test Cases Created vs Defects Found</h3>
+                        <div style="height: 250px;">
+                            <canvas id="testCasesVsDefectsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Test Execution vs Defects Found</h3>
+                        <div style="height: 250px;">
+                            <canvas id="executionVsDefectsChart"></canvas>
                         </div>
                     </div>
                 </div>

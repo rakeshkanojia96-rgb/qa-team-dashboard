@@ -77,9 +77,11 @@ function renderAnalytics() {
     renderAnalyticsKPIs();
     renderTopPerformers();
     renderPerformanceTrendsChart();
-    renderProjectDistributionChart();
     renderMemberComparisonChart();
-    renderDefectsVsTestsChart();
+    renderProjectTestCasesChart();
+    renderProjectExecutionChart();
+    renderTestCasesVsDefectsChart();
+    renderExecutionVsDefectsChart();
     renderMemberPerformanceSummary();
     lucide.createIcons();
 }
@@ -288,14 +290,14 @@ function renderPerformanceTrendsChart() {
     });
 }
 
-// Render Project Distribution Chart
-function renderProjectDistributionChart() {
-    const canvas = document.getElementById('projectDistributionChart');
+// Render Project Test Cases Distribution Chart
+function renderProjectTestCasesChart() {
+    const canvas = document.getElementById('projectTestCasesChart');
     const ctx = canvas.getContext('2d');
     const filteredData = getFilteredPerformanceByDate(performanceData);
 
-    if (window.projectDistributionChartInstance) {
-        window.projectDistributionChartInstance.destroy();
+    if (window.projectTestCasesChartInstance) {
+        window.projectTestCasesChartInstance.destroy();
     }
 
     if (filteredData.length === 0) {
@@ -313,7 +315,7 @@ function renderProjectDistributionChart() {
         if (!projectStats[project]) {
             projectStats[project] = 0;
         }
-        projectStats[project] += (perf.testsCreated || 0) + (perf.testsExecuted || 0);
+        projectStats[project] += (perf.testsCreated || 0);
     });
 
     const projects = Object.keys(projectStats).sort((a, b) => projectStats[b] - projectStats[a]).slice(0, 10);
@@ -332,7 +334,74 @@ function renderProjectDistributionChart() {
         'rgba(148, 163, 184, 0.8)'
     ];
 
-    window.projectDistributionChartInstance = new Chart(ctx, {
+    window.projectTestCasesChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: projects,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+}
+
+// Render Project Test Execution Chart
+function renderProjectExecutionChart() {
+    const canvas = document.getElementById('projectExecutionChart');
+    const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
+
+    if (window.projectExecutionChartInstance) {
+        window.projectExecutionChartInstance.destroy();
+    }
+
+    if (filteredData.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#9ca3af';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+
+    const projectStats = {};
+    filteredData.forEach(perf => {
+        const project = perf.projectName || 'Unknown';
+        if (!projectStats[project]) {
+            projectStats[project] = 0;
+        }
+        projectStats[project] += (perf.testsExecuted || 0);
+    });
+
+    const projects = Object.keys(projectStats).sort((a, b) => projectStats[b] - projectStats[a]).slice(0, 10);
+    const values = projects.map(p => projectStats[p]);
+
+    const colors = [
+        'rgba(34, 197, 94, 0.8)',
+        'rgba(59, 130, 246, 0.8)',
+        'rgba(168, 85, 247, 0.8)',
+        'rgba(234, 179, 8, 0.8)',
+        'rgba(99, 102, 241, 0.8)',
+        'rgba(249, 115, 22, 0.8)',
+        'rgba(20, 184, 166, 0.8)',
+        'rgba(236, 72, 153, 0.8)',
+        'rgba(239, 68, 68, 0.8)',
+        'rgba(148, 163, 184, 0.8)'
+    ];
+
+    window.projectExecutionChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: projects,
@@ -429,14 +498,14 @@ function renderMemberComparisonChart() {
     });
 }
 
-// Render Defects vs Tests Chart
-function renderDefectsVsTestsChart() {
-    const canvas = document.getElementById('defectsVsTestsChart');
+// Render Test Cases Created vs Defects Chart
+function renderTestCasesVsDefectsChart() {
+    const canvas = document.getElementById('testCasesVsDefectsChart');
     const ctx = canvas.getContext('2d');
     const filteredData = getFilteredPerformanceByDate(performanceData);
 
-    if (window.defectsVsTestsChartInstance) {
-        window.defectsVsTestsChartInstance.destroy();
+    if (window.testCasesVsDefectsChartInstance) {
+        window.testCasesVsDefectsChartInstance.destroy();
     }
 
     if (filteredData.length === 0 || teamMembers.length === 0) {
@@ -452,30 +521,30 @@ function renderDefectsVsTestsChart() {
     teamMembers.forEach(member => {
         memberStats[member.id] = {
             name: member.name,
-            tests: 0,
+            created: 0,
             defects: 0
         };
     });
 
     filteredData.forEach(perf => {
         if (memberStats[perf.memberId]) {
-            memberStats[perf.memberId].tests += (perf.testsCreated || 0) + (perf.testsExecuted || 0);
+            memberStats[perf.memberId].created += perf.testsCreated || 0;
             memberStats[perf.memberId].defects += perf.defectsReported || 0;
         }
     });
 
-    const members = Object.values(memberStats).filter(m => m.tests > 0);
+    const members = Object.values(memberStats).filter(m => m.created > 0);
     const scatterData = members.map(m => ({
-        x: m.tests,
+        x: m.created,
         y: m.defects,
         label: m.name
     }));
 
-    window.defectsVsTestsChartInstance = new Chart(ctx, {
+    window.testCasesVsDefectsChartInstance = new Chart(ctx, {
         type: 'scatter',
         data: {
             datasets: [{
-                label: 'Defects vs Tests',
+                label: 'Test Cases vs Defects',
                 data: scatterData,
                 backgroundColor: 'rgba(99, 102, 241, 0.6)',
                 borderColor: 'rgba(99, 102, 241, 1)',
@@ -493,7 +562,7 @@ function renderDefectsVsTestsChart() {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${scatterData[context.dataIndex].label}: ${context.parsed.x} tests, ${context.parsed.y} defects`;
+                            return `${scatterData[context.dataIndex].label}: ${context.parsed.x} TC created, ${context.parsed.y} defects`;
                         }
                     }
                 }
@@ -502,7 +571,96 @@ function renderDefectsVsTestsChart() {
                 x: {
                     title: {
                         display: true,
-                        text: 'Total Test Cases'
+                        text: 'Test Cases Created'
+                    },
+                    beginAtZero: true
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Defects Found'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Render Test Execution vs Defects Chart
+function renderExecutionVsDefectsChart() {
+    const canvas = document.getElementById('executionVsDefectsChart');
+    const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
+
+    if (window.executionVsDefectsChartInstance) {
+        window.executionVsDefectsChartInstance.destroy();
+    }
+
+    if (filteredData.length === 0 || teamMembers.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#9ca3af';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+
+    const memberStats = {};
+    teamMembers.forEach(member => {
+        memberStats[member.id] = {
+            name: member.name,
+            executed: 0,
+            defects: 0
+        };
+    });
+
+    filteredData.forEach(perf => {
+        if (memberStats[perf.memberId]) {
+            memberStats[perf.memberId].executed += perf.testsExecuted || 0;
+            memberStats[perf.memberId].defects += perf.defectsReported || 0;
+        }
+    });
+
+    const members = Object.values(memberStats).filter(m => m.executed > 0);
+    const scatterData = members.map(m => ({
+        x: m.executed,
+        y: m.defects,
+        label: m.name
+    }));
+
+    window.executionVsDefectsChartInstance = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Execution vs Defects',
+                data: scatterData,
+                backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                borderColor: 'rgba(34, 197, 94, 1)',
+                pointRadius: 8,
+                pointHoverRadius: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${scatterData[context.dataIndex].label}: ${context.parsed.x} TC executed, ${context.parsed.y} defects`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Test Cases Executed'
                     },
                     beginAtZero: true
                 },
