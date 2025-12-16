@@ -73,7 +73,20 @@ function getFilteredPerformanceByDate(data) {
         const perfDate = perf.period || perf.month;
         if (!perfDate) return false;
         
-        return perfDate >= analyticsDateFilter.fromDate && perfDate <= analyticsDateFilter.toDate;
+        // Handle different date formats: "YYYY-MM-DD" or "YYYY-MM"
+        // Convert to comparable format
+        let perfDateComparable = perfDate;
+        if (perfDate.length === 7) {
+            // Format is "YYYY-MM", add day for comparison
+            perfDateComparable = perfDate + '-01';
+        }
+        
+        // Extract year-month for comparison
+        const perfYearMonth = perfDateComparable.substring(0, 7);
+        const fromYearMonth = analyticsDateFilter.fromDate.substring(0, 7);
+        const toYearMonth = analyticsDateFilter.toDate.substring(0, 7);
+        
+        return perfYearMonth >= fromYearMonth && perfYearMonth <= toYearMonth;
     });
 }
 
