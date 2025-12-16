@@ -1122,7 +1122,12 @@
                     <div class="card stat-card p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <p class="text-white/80 text-sm font-medium">Total Test Cases</p>
+                                <p class="text-white/80 text-sm font-medium flex items-center gap-1">
+                                    Total Test Cases
+                                    <span class="info-tooltip" data-tooltip="Sum of all Test Cases Created in selected date range">
+                                        <i data-lucide="info" width="14" height="14" class="text-white/60"></i>
+                                    </span>
+                                </p>
                                 <h3 class="text-3xl font-bold mt-2" id="analytics-total-tc">0</h3>
                                 <p class="text-white/70 text-xs mt-1" id="analytics-tc-trend">No data</p>
                             </div>
@@ -1133,7 +1138,12 @@
                     <div class="card stat-card-green p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <p class="text-white/80 text-sm font-medium">Avg Execution Rate</p>
+                                <p class="text-white/80 text-sm font-medium flex items-center gap-1">
+                                    Avg Execution Rate
+                                    <span class="info-tooltip" data-tooltip="Formula: (Total TC Executed / Total TC Created) × 100%">
+                                        <i data-lucide="info" width="14" height="14" class="text-white/60"></i>
+                                    </span>
+                                </p>
                                 <h3 class="text-3xl font-bold mt-2" id="analytics-exec-rate">0%</h3>
                                 <p class="text-white/70 text-xs mt-1" id="analytics-exec-trend">No data</p>
                             </div>
@@ -1144,7 +1154,12 @@
                     <div class="card stat-card-orange p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <p class="text-white/80 text-sm font-medium">Total Defects</p>
+                                <p class="text-white/80 text-sm font-medium flex items-center gap-1">
+                                    Total Defects
+                                    <span class="info-tooltip" data-tooltip="Sum of all Defects Reported in selected date range">
+                                        <i data-lucide="info" width="14" height="14" class="text-white/60"></i>
+                                    </span>
+                                </p>
                                 <h3 class="text-3xl font-bold mt-2" id="analytics-total-defects">0</h3>
                                 <p class="text-white/70 text-xs mt-1" id="analytics-defects-trend">No data</p>
                             </div>
@@ -1155,7 +1170,12 @@
                     <div class="card stat-card-blue p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <p class="text-white/80 text-sm font-medium">Active Projects</p>
+                                <p class="text-white/80 text-sm font-medium flex items-center gap-1">
+                                    Active Projects
+                                    <span class="info-tooltip" data-tooltip="Count of unique projects in selected date range">
+                                        <i data-lucide="info" width="14" height="14" class="text-white/60"></i>
+                                    </span>
+                                </p>
                                 <h3 class="text-3xl font-bold mt-2" id="analytics-active-projects">0</h3>
                                 <p class="text-white/70 text-xs mt-1" id="analytics-projects-list">No projects</p>
                             </div>
@@ -1166,7 +1186,12 @@
 
                 <!-- Top Performers -->
                 <div class="card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Top Performers (As per Date range)</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        Top Performers (As per Date range)
+                        <span class="info-tooltip" data-tooltip="Score Formula: (TC Created × 20%) + (TC Executed × 40%) + (Defects × 40%)">
+                            <i data-lucide="info" width="18" height="18" class="text-gray-500"></i>
+                        </span>
+                    </h3>
                     <div id="top-performers-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <p class="text-gray-500">No performance data available</p>
                     </div>
@@ -1228,11 +1253,46 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total TC Created</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total TC Executed</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Defects</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avg per Month</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quality Score</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <span class="flex items-center gap-1">
+                                            Total TC Created
+                                            <span class="info-tooltip" data-tooltip="Sum of Test Cases Created">
+                                                <i data-lucide="info" width="12" height="12" class="text-gray-400"></i>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <span class="flex items-center gap-1">
+                                            Total TC Executed
+                                            <span class="info-tooltip" data-tooltip="Sum of Test Cases Executed">
+                                                <i data-lucide="info" width="12" height="12" class="text-gray-400"></i>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <span class="flex items-center gap-1">
+                                            Total Defects
+                                            <span class="info-tooltip" data-tooltip="Sum of Defects Reported">
+                                                <i data-lucide="info" width="12" height="12" class="text-gray-400"></i>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <span class="flex items-center gap-1">
+                                            Avg per Month
+                                            <span class="info-tooltip" data-tooltip="Formula: TC Executed / Number of Unique Months">
+                                                <i data-lucide="info" width="12" height="12" class="text-gray-400"></i>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <span class="flex items-center gap-1">
+                                            Quality Score
+                                            <span class="info-tooltip" data-tooltip="Formula: (Defects / TC Executed) × 100%. Green (≥10%) = Excellent, Yellow (5-9%) = Good, Red (<5%) = Needs Improvement">
+                                                <i data-lucide="info" width="12" height="12" class="text-gray-400"></i>
+                                            </span>
+                                        </span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="analytics-member-summary" class="bg-white divide-y divide-gray-200">

@@ -250,6 +250,47 @@ table th {
     }
 }
 
+/* Tooltip Styles */
+.info-tooltip {
+    position: relative;
+    display: inline-flex;
+    cursor: help;
+}
+
+.info-tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 280px;
+    z-index: 1000;
+    text-align: left;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.info-tooltip:hover::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 2px);
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    pointer-events: none;
+}
+
 /* Print Styles */
 @media print {
     aside,
@@ -263,5 +304,10 @@ table th {
     .card {
         box-shadow: none;
         border: 1px solid #e5e7eb;
+    }
+    
+    .info-tooltip::after,
+    .info-tooltip::before {
+        display: none !important;
     }
 }
