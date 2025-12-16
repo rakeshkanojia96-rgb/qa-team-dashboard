@@ -1687,20 +1687,88 @@ function deleteGoal(goalId) {
     showNotification('Goal deleted!', 'success');
 }
 
+// Dashboard date filter state
+let dashboardDateFilter = {
+    preset: '30',
+    fromDate: null,
+    toDate: null
+};
+
+// Apply dashboard date filter
+function applyDashboardDateFilter() {
+    const preset = document.getElementById('dashboard-date-preset').value;
+    const customDates = document.getElementById('dashboard-custom-dates');
+    
+    dashboardDateFilter.preset = preset;
+    
+    if (preset === 'custom') {
+        customDates.classList.remove('hidden');
+        dashboardDateFilter.fromDate = document.getElementById('dashboard-date-from').value;
+        dashboardDateFilter.toDate = document.getElementById('dashboard-date-to').value;
+    } else {
+        customDates.classList.add('hidden');
+        
+        if (preset === 'all') {
+            dashboardDateFilter.fromDate = null;
+            dashboardDateFilter.toDate = null;
+        } else {
+            const days = parseInt(preset);
+            const toDate = new Date();
+            const fromDate = new Date();
+            fromDate.setDate(fromDate.getDate() - days);
+            
+            dashboardDateFilter.fromDate = fromDate.toISOString().split('T')[0];
+            dashboardDateFilter.toDate = toDate.toISOString().split('T')[0];
+        }
+    }
+    
+    updateDashboard();
+}
+
+// Clear dashboard date filter
+function clearDashboardDateFilter() {
+    document.getElementById('dashboard-date-preset').value = '30';
+    document.getElementById('dashboard-date-from').value = '';
+    document.getElementById('dashboard-date-to').value = '';
+    document.getElementById('dashboard-custom-dates').classList.add('hidden');
+    
+    const toDate = new Date();
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 30);
+    
+    dashboardDateFilter = {
+        preset: '30',
+        fromDate: fromDate.toISOString().split('T')[0],
+        toDate: toDate.toISOString().split('T')[0]
+    };
+    
+    updateDashboard();
+}
+
+// Filter dashboard performance data by date
+function getFilteredDashboardPerformance(data) {
+    if (!dashboardDateFilter.fromDate || !dashboardDateFilter.toDate) {
+        return data;
+    }
+    
+    return data.filter(perf => {
+        const perfDate = perf.period || perf.month;
+        if (!perfDate) return false;
+        
+        return perfDate >= dashboardDateFilter.fromDate && perfDate <= dashboardDateFilter.toDate;
+    });
+}
+
 // Update dashboard
 function updateDashboard() {
     // Update stats
     document.getElementById('total-members').textContent = teamMembers.length;
     
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    // Filter for current month (supports both new 'period' and legacy 'month' fields)
-    const monthPerformance = performanceData.filter(p => {
-        const period = p.period || p.month;
-        return period && period.startsWith(currentMonth);
-    });
+    // Filter performance data by selected date range
+    const filteredPerformance = getFilteredDashboardPerformance(performanceData);
     
-    const totalTests = monthPerformance.reduce((sum, p) => sum + (p.testsExecuted || 0), 0);
-    const totalDefects = monthPerformance.reduce((sum, p) => sum + (p.defectsReported || 0), 0);
+    const totalTests = filteredPerformance.reduce((sum, p) => sum + (p.testsExecuted || 0), 0);
+    const totalDefects = filteredPerformance.reduce((sum, p) => sum + (p.defectsReported || 0), 0);
     
     document.getElementById('total-tests').textContent = totalTests;
     document.getElementById('total-bugs').textContent = totalDefects;
@@ -1731,6 +1799,9 @@ function updatePerformanceChart() {
         performanceChart.destroy();
     }
     
+    // Filter data by selected date range
+    const filteredData = getFilteredDashboardPerformance(performanceData);
+    
     // Get last 6 months of data
     const months = [];
     const testsData = [];
@@ -1742,7 +1813,10 @@ function updatePerformanceChart() {
         const monthStr = date.toISOString().slice(0, 7);
         months.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
         
-        const monthData = performanceData.filter(p => p.month === monthStr);
+        const monthData = filteredData.filter(p => {
+            const period = (p.period || p.month || '').slice(0, 7);
+            return period === monthStr;
+        });
         testsData.push(monthData.reduce((sum, p) => sum + (p.testsExecuted || 0), 0));
         bugsData.push(monthData.reduce((sum, p) => sum + (p.defectsReported || 0), 0));
     }

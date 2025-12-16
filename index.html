@@ -234,7 +234,34 @@
         <main class="flex-1 overflow-y-auto p-8">
             <!-- Dashboard Section -->
             <div id="dashboard-section" class="section">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">Team Overview</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Team Overview</h2>
+                    
+                    <!-- Date Filter -->
+                    <div class="flex items-center space-x-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="calendar" width="20" height="20" class="text-gray-600"></i>
+                            <label class="text-sm font-medium text-gray-700">Date Range:</label>
+                        </div>
+                        <select id="dashboard-date-preset" onchange="applyDashboardDateFilter()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">All Time</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="30" selected>Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="180">Last 6 Months</option>
+                            <option value="365">Last Year</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                        <div id="dashboard-custom-dates" class="hidden flex items-center space-x-2">
+                            <input type="date" id="dashboard-date-from" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyDashboardDateFilter()">
+                            <span class="text-gray-500">to</span>
+                            <input type="date" id="dashboard-date-to" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyDashboardDateFilter()">
+                        </div>
+                        <button onclick="clearDashboardDateFilter()" class="text-sm text-gray-600 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg">
+                            <i data-lucide="x" width="16" height="16" class="inline"></i>
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -1061,7 +1088,34 @@
 
             <!-- Analytics Section -->
             <div id="analytics-section" class="section hidden">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">Team Analytics</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Team Analytics</h2>
+                    
+                    <!-- Date Filter -->
+                    <div class="flex items-center space-x-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="calendar" width="20" height="20" class="text-gray-600"></i>
+                            <label class="text-sm font-medium text-gray-700">Date Range:</label>
+                        </div>
+                        <select id="analytics-date-preset" onchange="applyAnalyticsDateFilter()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">All Time</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="30" selected>Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="180">Last 6 Months</option>
+                            <option value="365">Last Year</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                        <div id="analytics-custom-dates" class="hidden flex items-center space-x-2">
+                            <input type="date" id="analytics-date-from" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyAnalyticsDateFilter()">
+                            <span class="text-gray-500">to</span>
+                            <input type="date" id="analytics-date-to" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="applyAnalyticsDateFilter()">
+                        </div>
+                        <button onclick="clearAnalyticsDateFilter()" class="text-sm text-gray-600 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg">
+                            <i data-lucide="x" width="16" height="16" class="inline"></i>
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Analytics KPI Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

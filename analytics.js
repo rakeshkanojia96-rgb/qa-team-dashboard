@@ -1,5 +1,77 @@
 // Analytics rendering and calculations
 
+// Analytics date filter state
+let analyticsDateFilter = {
+    preset: '30',
+    fromDate: null,
+    toDate: null
+};
+
+// Apply analytics date filter
+function applyAnalyticsDateFilter() {
+    const preset = document.getElementById('analytics-date-preset').value;
+    const customDates = document.getElementById('analytics-custom-dates');
+    
+    analyticsDateFilter.preset = preset;
+    
+    if (preset === 'custom') {
+        customDates.classList.remove('hidden');
+        analyticsDateFilter.fromDate = document.getElementById('analytics-date-from').value;
+        analyticsDateFilter.toDate = document.getElementById('analytics-date-to').value;
+    } else {
+        customDates.classList.add('hidden');
+        
+        if (preset === 'all') {
+            analyticsDateFilter.fromDate = null;
+            analyticsDateFilter.toDate = null;
+        } else {
+            const days = parseInt(preset);
+            const toDate = new Date();
+            const fromDate = new Date();
+            fromDate.setDate(fromDate.getDate() - days);
+            
+            analyticsDateFilter.fromDate = fromDate.toISOString().split('T')[0];
+            analyticsDateFilter.toDate = toDate.toISOString().split('T')[0];
+        }
+    }
+    
+    renderAnalytics();
+}
+
+// Clear analytics date filter
+function clearAnalyticsDateFilter() {
+    document.getElementById('analytics-date-preset').value = '30';
+    document.getElementById('analytics-date-from').value = '';
+    document.getElementById('analytics-date-to').value = '';
+    document.getElementById('analytics-custom-dates').classList.add('hidden');
+    
+    const toDate = new Date();
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 30);
+    
+    analyticsDateFilter = {
+        preset: '30',
+        fromDate: fromDate.toISOString().split('T')[0],
+        toDate: toDate.toISOString().split('T')[0]
+    };
+    
+    renderAnalytics();
+}
+
+// Filter performance data by date
+function getFilteredPerformanceByDate(data) {
+    if (!analyticsDateFilter.fromDate || !analyticsDateFilter.toDate) {
+        return data;
+    }
+    
+    return data.filter(perf => {
+        const perfDate = perf.period || perf.month;
+        if (!perfDate) return false;
+        
+        return perfDate >= analyticsDateFilter.fromDate && perfDate <= analyticsDateFilter.toDate;
+    });
+}
+
 // Render all analytics
 function renderAnalytics() {
     renderAnalyticsKPIs();
@@ -14,7 +86,9 @@ function renderAnalytics() {
 
 // Render Analytics KPI Cards
 function renderAnalyticsKPIs() {
-    if (performanceData.length === 0) {
+    const filteredData = getFilteredPerformanceByDate(performanceData);
+    
+    if (filteredData.length === 0) {
         document.getElementById('analytics-total-tc').textContent = '0';
         document.getElementById('analytics-exec-rate').textContent = '0%';
         document.getElementById('analytics-total-defects').textContent = '0';
@@ -28,7 +102,7 @@ function renderAnalyticsKPIs() {
     let totalDefects = 0;
     const projects = new Set();
 
-    performanceData.forEach(perf => {
+    filteredData.forEach(perf => {
         totalCreated += perf.testsCreated || 0;
         totalExecuted += perf.testsExecuted || 0;
         totalDefects += perf.defectsReported || 0;
@@ -46,28 +120,23 @@ function renderAnalyticsKPIs() {
     // Update trends
     document.getElementById('analytics-tc-trend').textContent = `${totalExecuted.toLocaleString()} executed`;
     document.getElementById('analytics-exec-trend').textContent = execRate >= 80 ? 'Good' : 'Needs improvement';
-    document.getElementById('analytics-defects-trend').textContent = `${(totalDefects / performanceData.length).toFixed(1)} avg per record`;
+    document.getElementById('analytics-defects-trend').textContent = `${(totalDefects / filteredData.length).toFixed(1)} avg per record`;
     document.getElementById('analytics-projects-list').textContent = Array.from(projects).slice(0, 3).join(', ');
 }
 
 // Render Top Performers
 function renderTopPerformers() {
     const container = document.getElementById('top-performers-list');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
     
-    if (performanceData.length === 0 || teamMembers.length === 0) {
+    if (filteredData.length === 0 || teamMembers.length === 0) {
         container.innerHTML = '<p class="text-gray-500">No performance data available</p>';
         return;
     }
 
-    // Calculate last 30 days performance
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
     const memberStats = {};
     
-    performanceData.forEach(perf => {
-        const perfDate = new Date(perf.period || perf.month);
-        if (perfDate < thirtyDaysAgo) return;
+    filteredData.forEach(perf => {
 
         if (!memberStats[perf.memberId]) {
             memberStats[perf.memberId] = {
@@ -131,13 +200,14 @@ function renderTopPerformers() {
 function renderPerformanceTrendsChart() {
     const canvas = document.getElementById('testTrendsChart');
     const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
 
     // Destroy existing chart if any
     if (window.testTrendsChartInstance) {
         window.testTrendsChartInstance.destroy();
     }
 
-    if (performanceData.length === 0) {
+    if (filteredData.length === 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.font = '14px sans-serif';
         ctx.fillStyle = '#9ca3af';
@@ -222,12 +292,13 @@ function renderPerformanceTrendsChart() {
 function renderProjectDistributionChart() {
     const canvas = document.getElementById('projectDistributionChart');
     const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
 
     if (window.projectDistributionChartInstance) {
         window.projectDistributionChartInstance.destroy();
     }
 
-    if (performanceData.length === 0) {
+    if (filteredData.length === 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.font = '14px sans-serif';
         ctx.fillStyle = '#9ca3af';
@@ -237,7 +308,7 @@ function renderProjectDistributionChart() {
     }
 
     const projectStats = {};
-    performanceData.forEach(perf => {
+    filteredData.forEach(perf => {
         const project = perf.projectName || 'Unknown';
         if (!projectStats[project]) {
             projectStats[project] = 0;
@@ -288,12 +359,13 @@ function renderProjectDistributionChart() {
 function renderMemberComparisonChart() {
     const canvas = document.getElementById('memberComparisonChart');
     const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
 
     if (window.memberComparisonChartInstance) {
         window.memberComparisonChartInstance.destroy();
     }
 
-    if (performanceData.length === 0 || teamMembers.length === 0) {
+    if (filteredData.length === 0 || teamMembers.length === 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.font = '14px sans-serif';
         ctx.fillStyle = '#9ca3af';
@@ -312,7 +384,7 @@ function renderMemberComparisonChart() {
         };
     });
 
-    performanceData.forEach(perf => {
+    filteredData.forEach(perf => {
         if (memberStats[perf.memberId]) {
             memberStats[perf.memberId].created += perf.testsCreated || 0;
             memberStats[perf.memberId].executed += perf.testsExecuted || 0;
@@ -361,12 +433,13 @@ function renderMemberComparisonChart() {
 function renderDefectsVsTestsChart() {
     const canvas = document.getElementById('defectsVsTestsChart');
     const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
 
     if (window.defectsVsTestsChartInstance) {
         window.defectsVsTestsChartInstance.destroy();
     }
 
-    if (performanceData.length === 0 || teamMembers.length === 0) {
+    if (filteredData.length === 0 || teamMembers.length === 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.font = '14px sans-serif';
         ctx.fillStyle = '#9ca3af';
@@ -384,7 +457,7 @@ function renderDefectsVsTestsChart() {
         };
     });
 
-    performanceData.forEach(perf => {
+    filteredData.forEach(perf => {
         if (memberStats[perf.memberId]) {
             memberStats[perf.memberId].tests += (perf.testsCreated || 0) + (perf.testsExecuted || 0);
             memberStats[perf.memberId].defects += perf.defectsReported || 0;
@@ -448,8 +521,9 @@ function renderDefectsVsTestsChart() {
 // Render Member Performance Summary Table
 function renderMemberPerformanceSummary() {
     const tbody = document.getElementById('analytics-member-summary');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
     
-    if (performanceData.length === 0 || teamMembers.length === 0) {
+    if (filteredData.length === 0 || teamMembers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No data available</td></tr>';
         return;
     }
@@ -465,7 +539,7 @@ function renderMemberPerformanceSummary() {
         };
     });
 
-    performanceData.forEach(perf => {
+    filteredData.forEach(perf => {
         if (memberStats[perf.memberId]) {
             memberStats[perf.memberId].created += perf.testsCreated || 0;
             memberStats[perf.memberId].executed += perf.testsExecuted || 0;
