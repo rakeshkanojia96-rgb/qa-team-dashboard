@@ -711,14 +711,14 @@ function renderMemberPerformanceSummary() {
     const summaries = Object.values(memberStats)
         .map(stats => {
             const monthCount = stats.months.size || 1;
-            const avgPerMonth = ((stats.created + stats.executed) / monthCount).toFixed(1);
+            const avgPerMonth = (stats.executed / monthCount).toFixed(1);
             const qualityScore = stats.executed > 0 
                 ? ((stats.defects / stats.executed) * 100).toFixed(1)
                 : 0;
             
             return { ...stats, avgPerMonth, qualityScore, monthCount };
         })
-        .sort((a, b) => (b.created + b.executed) - (a.created + a.executed));
+        .sort((a, b) => b.executed - a.executed);
 
     tbody.innerHTML = summaries.map(stats => `
         <tr>
@@ -739,8 +739,8 @@ function renderMemberPerformanceSummary() {
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-center">
                 <span class="px-2 py-1 text-xs font-medium rounded-full ${
-                    stats.qualityScore < 5 ? 'bg-green-100 text-green-800' :
-                    stats.qualityScore < 10 ? 'bg-yellow-100 text-yellow-800' :
+                    stats.qualityScore >= 10 ? 'bg-green-100 text-green-800' :
+                    stats.qualityScore >= 5 ? 'bg-yellow-100 text-yellow-800' :
                     'bg-red-100 text-red-800'
                 }">
                     ${stats.qualityScore}% defect rate
