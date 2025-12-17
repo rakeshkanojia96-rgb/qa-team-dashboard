@@ -1775,10 +1775,19 @@ function updateDashboard() {
     document.getElementById('total-tests').textContent = totalTests;
     document.getElementById('total-bugs').textContent = totalDefects;
     
-    // Calculate average attendance
+    // Calculate average attendance (filtered by date range)
     if (teamMembers.length > 0 && attendanceData.length > 0) {
         const avgAttendance = teamMembers.map(member => {
-            const memberAtt = attendanceData.filter(a => a.memberId === member.id);
+            let memberAtt = attendanceData.filter(a => a.memberId === member.id);
+            
+            // Apply date filter if set
+            if (dashboardDateFilter.fromDate && dashboardDateFilter.toDate) {
+                memberAtt = memberAtt.filter(a => 
+                    a.date >= dashboardDateFilter.fromDate && 
+                    a.date <= dashboardDateFilter.toDate
+                );
+            }
+            
             const present = memberAtt.filter(a => 
                 a.status === 'available' || 
                 a.status === 'present' || 
