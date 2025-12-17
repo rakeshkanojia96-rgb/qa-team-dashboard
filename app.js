@@ -350,7 +350,9 @@ async function handleAuthSubmit(e) {
     try {
         let result;
         if (isAuthSignupMode) {
-            result = await supabaseClient.auth.signUp({ email, password });
+            // Signup is disabled
+            showNotification('Sign up is currently disabled. Please contact admin.', 'error');
+            return;
         } else {
             result = await supabaseClient.auth.signInWithPassword({ email, password });
         }
