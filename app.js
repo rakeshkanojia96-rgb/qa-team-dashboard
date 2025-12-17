@@ -1779,7 +1779,11 @@ function updateDashboard() {
     if (teamMembers.length > 0 && attendanceData.length > 0) {
         const avgAttendance = teamMembers.map(member => {
             const memberAtt = attendanceData.filter(a => a.memberId === member.id);
-            const present = memberAtt.filter(a => a.status === 'present' || a.status === 'wfh').length;
+            const present = memberAtt.filter(a => 
+                a.status === 'available' || 
+                a.status === 'present' || 
+                a.status === 'wfh'
+            ).length;
             return memberAtt.length > 0 ? (present / memberAtt.length) * 100 : 0;
         });
         const avg = avgAttendance.reduce((sum, val) => sum + val, 0) / teamMembers.length;
