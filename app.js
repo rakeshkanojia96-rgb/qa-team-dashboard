@@ -4046,6 +4046,12 @@ document.addEventListener('DOMContentLoaded', function() {
         holidayForm.addEventListener('submit', handleAddHoliday);
     }
     
+    // Initialize edit holiday form
+    const editHolidayForm = document.getElementById('edit-holiday-form');
+    if (editHolidayForm) {
+        editHolidayForm.addEventListener('submit', handleEditHoliday);
+    }
+    
     // Initialize bulk edit form
     const bulkEditForm = document.getElementById('bulk-edit-attendance-form');
     if (bulkEditForm) {
@@ -4106,27 +4112,58 @@ function loadWeekendSettings() {
 function handleAddHoliday(e) {
     e.preventDefault();
     
-    const holiday = {
-        id: Date.now().toString(),
-        name: document.getElementById('holiday-name').value,
-        date: document.getElementById('holiday-date').value,
-        type: document.getElementById('holiday-type').value,
-        description: document.getElementById('holiday-description').value,
-        addedDate: new Date().toISOString()
-    };
+    const name = document.getElementById('holiday-name').value;
+    const fromDate = document.getElementById('holiday-date-from').value;
+    const toDate = document.getElementById('holiday-date-to').value;
+    const type = document.getElementById('holiday-type').value;
+    const description = document.getElementById('holiday-description').value;
     
-    // Check if holiday already exists for this date
-    if (holidaysData.some(h => h.date === holiday.date)) {
-        showNotification('A holiday already exists for this date!', 'error');
+    if (!fromDate) {
+        showNotification('Please select a start date!', 'error');
         return;
     }
     
-    holidaysData.push(holiday);
+    // Create holidays for date range
+    const startDate = new Date(fromDate + 'T00:00:00');
+    const endDate = toDate ? new Date(toDate + 'T00:00:00') : startDate;
+    
+    if (endDate < startDate) {
+        showNotification('End date must be after start date!', 'error');
+        return;
+    }
+    
+    const holidaysToAdd = [];
+    const currentDate = new Date(startDate);
+    
+    while (currentDate <= endDate) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
+        // Check if holiday already exists for this date
+        if (holidaysData.some(h => h.date === dateStr)) {
+            showNotification(`A holiday already exists for ${dateStr}!`, 'error');
+            return;
+        }
+        
+        holidaysToAdd.push({
+            id: Date.now().toString() + '_' + currentDate.getTime(),
+            name: name,
+            date: dateStr,
+            type: type,
+            description: description,
+            addedDate: new Date().toISOString()
+        });
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    holidaysData.push(...holidaysToAdd);
     saveData(STORAGE_KEYS.HOLIDAYS, holidaysData);
     renderHolidaysList();
     renderAttendanceCalendar();
     document.getElementById('add-holiday-form').reset();
-    showNotification('Holiday added successfully!', 'success');
+    
+    const count = holidaysToAdd.length;
+    showNotification(`${count} holiday${count > 1 ? 's' : ''} added successfully!`, 'success');
 }
 
 // Render holidays list
@@ -4177,16 +4214,96 @@ function renderHolidaysList() {
                         </div>
                     </div>
                 </div>
-                <button onclick="deleteHoliday('${holiday.id}')" 
-                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                        title="Delete">
-                    <i data-lucide="trash-2" width="18" height="18"></i>
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="editHoliday('${holiday.id}')" 
+                            class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                            title="Edit">
+                        <i data-lucide="edit-2" width="18" height="18"></i>
+                    </button>
+                    <button onclick="duplicateHoliday('${holiday.id}')" 
+                            class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                            title="Duplicate">
+                        <i data-lucide="copy" width="18" height="18"></i>
+                    </button>
+                    <button onclick="deleteHoliday('${holiday.id}')" 
+                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                            title="Delete">
+                        <i data-lucide="trash-2" width="18" height="18"></i>
+                    </button>
+                </div>
             </div>
         `;
     }).join('');
     
     lucide.createIcons();
+}
+
+// Edit holiday
+function editHoliday(holidayId) {
+    const holiday = holidaysData.find(h => h.id === holidayId);
+    if (!holiday) return;
+    
+    document.getElementById('edit-holiday-id').value = holiday.id;
+    document.getElementById('edit-holiday-name').value = holiday.name;
+    document.getElementById('edit-holiday-date').value = holiday.date;
+    document.getElementById('edit-holiday-type').value = holiday.type;
+    document.getElementById('edit-holiday-description').value = holiday.description || '';
+    
+    document.getElementById('edit-holiday-modal').classList.remove('hidden');
+    lucide.createIcons();
+}
+
+function closeEditHolidayModal() {
+    document.getElementById('edit-holiday-modal').classList.add('hidden');
+    document.getElementById('edit-holiday-form').reset();
+}
+
+function handleEditHoliday(e) {
+    e.preventDefault();
+    
+    const holidayId = document.getElementById('edit-holiday-id').value;
+    const name = document.getElementById('edit-holiday-name').value;
+    const date = document.getElementById('edit-holiday-date').value;
+    const type = document.getElementById('edit-holiday-type').value;
+    const description = document.getElementById('edit-holiday-description').value;
+    
+    const holiday = holidaysData.find(h => h.id === holidayId);
+    if (!holiday) return;
+    
+    // Check if another holiday exists for this date (excluding current)
+    if (holidaysData.some(h => h.id !== holidayId && h.date === date)) {
+        showNotification('A holiday already exists for this date!', 'error');
+        return;
+    }
+    
+    holiday.name = name;
+    holiday.date = date;
+    holiday.type = type;
+    holiday.description = description;
+    
+    saveData(STORAGE_KEYS.HOLIDAYS, holidaysData);
+    renderHolidaysList();
+    renderAttendanceCalendar();
+    closeEditHolidayModal();
+    showNotification('Holiday updated successfully!', 'success');
+}
+
+// Duplicate holiday
+function duplicateHoliday(holidayId) {
+    const holiday = holidaysData.find(h => h.id === holidayId);
+    if (!holiday) return;
+    
+    const duplicate = {
+        ...holiday,
+        id: Date.now().toString(),
+        addedDate: new Date().toISOString()
+    };
+    
+    holidaysData.push(duplicate);
+    saveData(STORAGE_KEYS.HOLIDAYS, holidaysData);
+    renderHolidaysList();
+    renderAttendanceCalendar();
+    showNotification('Holiday duplicated successfully! You can now edit it.', 'success');
 }
 
 // Delete holiday
