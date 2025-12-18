@@ -4133,27 +4133,32 @@ function handleAddHoliday(e) {
     }
     
     const holidaysToAdd = [];
+    const skippedDates = [];
     const currentDate = new Date(startDate);
     
     while (currentDate <= endDate) {
         const dateStr = currentDate.toISOString().split('T')[0];
         
-        // Check if holiday already exists for this date
+        // Skip if holiday already exists for this date
         if (holidaysData.some(h => h.date === dateStr)) {
-            showNotification(`A holiday already exists for ${dateStr}!`, 'error');
-            return;
+            skippedDates.push(dateStr);
+        } else {
+            holidaysToAdd.push({
+                id: Date.now().toString() + '_' + currentDate.getTime(),
+                name: name,
+                date: dateStr,
+                type: type,
+                description: description,
+                addedDate: new Date().toISOString()
+            });
         }
         
-        holidaysToAdd.push({
-            id: Date.now().toString() + '_' + currentDate.getTime(),
-            name: name,
-            date: dateStr,
-            type: type,
-            description: description,
-            addedDate: new Date().toISOString()
-        });
-        
         currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    if (holidaysToAdd.length === 0) {
+        showNotification('All dates in this range already have holidays!', 'error');
+        return;
     }
     
     holidaysData.push(...holidaysToAdd);
@@ -4163,7 +4168,11 @@ function handleAddHoliday(e) {
     document.getElementById('add-holiday-form').reset();
     
     const count = holidaysToAdd.length;
-    showNotification(`${count} holiday${count > 1 ? 's' : ''} added successfully!`, 'success');
+    let message = `${count} holiday${count > 1 ? 's' : ''} added successfully!`;
+    if (skippedDates.length > 0) {
+        message += ` (${skippedDates.length} date${skippedDates.length > 1 ? 's' : ''} skipped - already exist)`;
+    }
+    showNotification(message, 'success');
 }
 
 // Render holidays list
