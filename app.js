@@ -32,6 +32,10 @@ let attendanceData = [];
 let goalsData = [];
 let ratingsData = [];
 let holidaysData = [];
+let holidaysPagination = {
+    currentPage: 1,
+    itemsPerPage: 10
+};
 let appSettings = {
     weekendDays: [0, 6], // 0 = Sunday, 6 = Saturday
     excludeWeekendsFromAttendance: true
@@ -4178,17 +4182,31 @@ function handleAddHoliday(e) {
 // Render holidays list
 function renderHolidaysList() {
     const container = document.getElementById('holidays-list');
+    const paginationContainer = document.getElementById('holidays-pagination');
     if (!container) return;
     
     if (holidaysData.length === 0) {
         container.innerHTML = '<p class="text-gray-500 text-center py-4">No holidays added yet.</p>';
+        if (paginationContainer) paginationContainer.style.display = 'none';
         return;
     }
     
     // Sort holidays by date
     const sortedHolidays = [...holidaysData].sort((a, b) => new Date(a.date) - new Date(b.date));
     
-    container.innerHTML = sortedHolidays.map(holiday => {
+    // Pagination
+    const totalItems = sortedHolidays.length;
+    const totalPages = Math.ceil(totalItems / holidaysPagination.itemsPerPage);
+    const startIndex = (holidaysPagination.currentPage - 1) * holidaysPagination.itemsPerPage;
+    const endIndex = Math.min(startIndex + holidaysPagination.itemsPerPage, totalItems);
+    const paginatedHolidays = sortedHolidays.slice(startIndex, endIndex);
+    
+    // Show pagination controls
+    if (paginationContainer) {
+        paginationContainer.style.display = totalPages > 1 ? 'flex' : 'none';
+    }
+    
+    container.innerHTML = paginatedHolidays.map(holiday => {
         const date = new Date(holiday.date + 'T00:00:00');
         const formattedDate = date.toLocaleDateString('en-US', { 
             weekday: 'short',
@@ -4245,7 +4263,72 @@ function renderHolidaysList() {
         `;
     }).join('');
     
+    // Update pagination info
+    updateHolidaysPaginationInfo(startIndex + 1, endIndex, totalItems, holidaysPagination.currentPage, totalPages);
+    
     lucide.createIcons();
+}
+
+// Update holidays pagination info
+function updateHolidaysPaginationInfo(start, end, total, currentPage, totalPages) {
+    document.getElementById('holidays-showing-start').textContent = start;
+    document.getElementById('holidays-showing-end').textContent = end;
+    document.getElementById('holidays-total').textContent = total;
+    
+    // Update prev/next buttons
+    const prevBtn = document.getElementById('holidays-prev-btn');
+    const nextBtn = document.getElementById('holidays-next-btn');
+    
+    if (prevBtn) {
+        prevBtn.disabled = currentPage === 1;
+    }
+    if (nextBtn) {
+        nextBtn.disabled = currentPage === totalPages;
+    }
+    
+    // Render page numbers
+    const pageNumbersContainer = document.getElementById('holidays-page-numbers');
+    if (!pageNumbersContainer) return;
+    
+    let pageButtons = '';
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        pageButtons += `
+            <button onclick="goToHolidaysPage(${i})" 
+                    class="px-3 py-1 rounded-lg text-sm ${isActive ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'}">
+                ${i}
+            </button>
+        `;
+    }
+    
+    pageNumbersContainer.innerHTML = pageButtons;
+}
+
+// Change holidays page (prev/next)
+function changeHolidaysPage(direction) {
+    const totalPages = Math.ceil(holidaysData.length / holidaysPagination.itemsPerPage);
+    
+    if (direction === 'prev' && holidaysPagination.currentPage > 1) {
+        holidaysPagination.currentPage--;
+    } else if (direction === 'next' && holidaysPagination.currentPage < totalPages) {
+        holidaysPagination.currentPage++;
+    }
+    
+    renderHolidaysList();
+}
+
+// Go to specific holidays page
+function goToHolidaysPage(page) {
+    holidaysPagination.currentPage = page;
+    renderHolidaysList();
 }
 
 // Edit holiday
