@@ -705,7 +705,7 @@ function renderMemberPerformanceSummary() {
     const filteredData = getFilteredPerformanceByDate(performanceData);
     
     if (filteredData.length === 0 || teamMembers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No data available</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No data available</td></tr>';
         return;
     }
 
@@ -716,6 +716,7 @@ function renderMemberPerformanceSummary() {
             created: 0,
             executed: 0,
             defects: 0,
+            asanaTickets: 0,
             months: new Set()
         };
     });
@@ -725,6 +726,7 @@ function renderMemberPerformanceSummary() {
             memberStats[perf.memberId].created += perf.testsCreated || 0;
             memberStats[perf.memberId].executed += perf.testsExecuted || 0;
             memberStats[perf.memberId].defects += perf.defectsReported || 0;
+            memberStats[perf.memberId].asanaTickets += perf.asanaTickets || 0;
             
             const period = (perf.period || perf.month || '').slice(0, 7);
             if (period) memberStats[perf.memberId].months.add(period);
@@ -756,6 +758,9 @@ function renderMemberPerformanceSummary() {
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900">
                 ${stats.defects.toLocaleString()}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-gray-900">
+                ${stats.asanaTickets.toLocaleString()}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-center text-gray-600">
                 ${stats.avgPerMonth}
