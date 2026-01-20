@@ -100,6 +100,8 @@ function renderAnalytics() {
     renderProjectExecutionChart();
     renderTestCasesVsDefectsChart();
     renderExecutionVsDefectsChart();
+    renderExecutionTicketsDefectsTrendChart();
+    renderAsanaTicketsProjectTrendChart();
     renderMemberPerformanceSummary();
     lucide.createIcons();
 }
@@ -236,20 +238,23 @@ function renderPerformanceTrendsChart() {
         return;
     }
 
-    // Get last 6 months data
-    const months = [];
-    const now = new Date();
-    for (let i = 5; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        months.push(date.toISOString().slice(0, 7));
-    }
+    // Get unique months from filtered data
+    const monthsSet = new Set();
+    filteredData.forEach(perf => {
+        const period = (perf.period || perf.month || '').slice(0, 7);
+        if (period) {
+            monthsSet.add(period);
+        }
+    });
+    
+    const months = Array.from(monthsSet).sort();
 
     const monthlyData = {};
     months.forEach(month => {
         monthlyData[month] = { created: 0, executed: 0, defects: 0 };
     });
 
-    performanceData.forEach(perf => {
+    filteredData.forEach(perf => {
         const period = (perf.period || perf.month || '').slice(0, 7);
         if (monthlyData[period]) {
             monthlyData[period].created += perf.testsCreated || 0;
@@ -766,4 +771,199 @@ function renderMemberPerformanceSummary() {
             </td>
         </tr>
     `).join('');
+}
+
+// Render Test Case Executed, Asana Tickets & Defect Trends Chart
+function renderExecutionTicketsDefectsTrendChart() {
+    const canvas = document.getElementById('executionTicketsDefectsTrendChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
+
+    // Destroy existing chart if any
+    if (window.executionTicketsDefectsTrendChartInstance) {
+        window.executionTicketsDefectsTrendChartInstance.destroy();
+    }
+
+    if (filteredData.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#9ca3af';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+
+    // Get unique months from filtered data
+    const monthsSet = new Set();
+    filteredData.forEach(perf => {
+        const period = (perf.period || perf.month || '').slice(0, 7);
+        if (period) {
+            monthsSet.add(period);
+        }
+    });
+    
+    const months = Array.from(monthsSet).sort();
+
+    const monthlyData = {};
+    months.forEach(month => {
+        monthlyData[month] = { executed: 0, asanaTickets: 0, defects: 0 };
+    });
+
+    filteredData.forEach(perf => {
+        const period = (perf.period || perf.month || '').slice(0, 7);
+        if (monthlyData[period]) {
+            monthlyData[period].executed += perf.testsExecuted || 0;
+            monthlyData[period].asanaTickets += perf.asanaTickets || 0;
+            monthlyData[period].defects += perf.defectsReported || 0;
+        }
+    });
+
+    const labels = months.map(m => {
+        const date = new Date(m + '-01');
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    });
+
+    window.executionTicketsDefectsTrendChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Tests Executed',
+                    data: months.map(m => monthlyData[m].executed),
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: 'Asana Tickets',
+                    data: months.map(m => monthlyData[m].asanaTickets),
+                    borderColor: 'rgb(99, 102, 241)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: 'Defects Found',
+                    data: months.map(m => monthlyData[m].defects),
+                    borderColor: 'rgb(249, 115, 22)',
+                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Render Asana Tickets Project Wise Trends Chart
+function renderAsanaTicketsProjectTrendChart() {
+    const canvas = document.getElementById('asanaTicketsProjectTrendChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const filteredData = getFilteredPerformanceByDate(performanceData);
+
+    // Destroy existing chart if any
+    if (window.asanaTicketsProjectTrendChartInstance) {
+        window.asanaTicketsProjectTrendChartInstance.destroy();
+    }
+
+    if (filteredData.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#9ca3af';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+
+    // Get unique months from filtered data
+    const monthsSet = new Set();
+    const projectsSet = new Set();
+    
+    filteredData.forEach(perf => {
+        const period = (perf.period || perf.month || '').slice(0, 7);
+        const project = perf.projectName || 'Unknown';
+        if (period) {
+            monthsSet.add(period);
+            projectsSet.add(project);
+        }
+    });
+    
+    const months = Array.from(monthsSet).sort();
+    const projects = Array.from(projectsSet).slice(0, 5); // Top 5 projects
+
+    // Initialize data structure
+    const projectMonthlyData = {};
+    projects.forEach(project => {
+        projectMonthlyData[project] = {};
+        months.forEach(month => {
+            projectMonthlyData[project][month] = 0;
+        });
+    });
+
+    // Aggregate data
+    filteredData.forEach(perf => {
+        const period = (perf.period || perf.month || '').slice(0, 7);
+        const project = perf.projectName || 'Unknown';
+        if (projects.includes(project) && projectMonthlyData[project][period] !== undefined) {
+            projectMonthlyData[project][period] += perf.asanaTickets || 0;
+        }
+    });
+
+    const labels = months.map(m => {
+        const date = new Date(m + '-01');
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    });
+
+    const colors = [
+        { border: 'rgb(99, 102, 241)', bg: 'rgba(99, 102, 241, 0.1)' },
+        { border: 'rgb(34, 197, 94)', bg: 'rgba(34, 197, 94, 0.1)' },
+        { border: 'rgb(249, 115, 22)', bg: 'rgba(249, 115, 22, 0.1)' },
+        { border: 'rgb(236, 72, 153)', bg: 'rgba(236, 72, 153, 0.1)' },
+        { border: 'rgb(59, 130, 246)', bg: 'rgba(59, 130, 246, 0.1)' }
+    ];
+
+    const datasets = projects.map((project, index) => ({
+        label: project,
+        data: months.map(m => projectMonthlyData[project][m]),
+        borderColor: colors[index % colors.length].border,
+        backgroundColor: colors[index % colors.length].bg,
+        tension: 0.4
+    }));
+
+    window.asanaTicketsProjectTrendChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 }

@@ -1225,7 +1225,7 @@
                 <!-- Charts Row 1 -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="card p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Performance Trends (Last 6 Months)</h3>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Performance Trends</h3>
                         <div style="height: 250px;">
                             <canvas id="testTrendsChart"></canvas>
                         </div>
@@ -1266,6 +1266,22 @@
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Test Execution vs Defects Found</h3>
                         <div style="height: 250px;">
                             <canvas id="executionVsDefectsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row 4 - New Trend Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Test Case Executed, Asana Tickets & Defect Trends</h3>
+                        <div style="height: 250px;">
+                            <canvas id="executionTicketsDefectsTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Asana Tickets - Project Wise Trends</h3>
+                        <div style="height: 250px;">
+                            <canvas id="asanaTicketsProjectTrendChart"></canvas>
                         </div>
                     </div>
                 </div>
