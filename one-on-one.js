@@ -72,10 +72,15 @@ function populateOneOnOneMemberSelect() {
         return;
     }
     
+    console.log('Attempting to populate 1-on-1 dropdown...');
+    console.log('teamMembers available:', typeof teamMembers !== 'undefined');
+    console.log('teamMembers length:', Array.isArray(teamMembers) ? teamMembers.length : 'Not an array');
+    console.log('teamMembers data:', teamMembers);
+    
     select.innerHTML = '<option value="">Choose a team member...</option>';
     
     // Check if teamMembers is available and populated
-    if (!teamMembers || teamMembers.length === 0) {
+    if (typeof teamMembers === 'undefined' || !Array.isArray(teamMembers) || teamMembers.length === 0) {
         console.warn('No team members available for 1-on-1 review');
         const option = document.createElement('option');
         option.value = '';
@@ -92,7 +97,7 @@ function populateOneOnOneMemberSelect() {
         select.appendChild(option);
     });
     
-    console.log(`Populated 1-on-1 dropdown with ${teamMembers.length} members`);
+    console.log(`✓ Successfully populated 1-on-1 dropdown with ${teamMembers.length} members`);
 }
 
 // Main render function for 1-on-1 review

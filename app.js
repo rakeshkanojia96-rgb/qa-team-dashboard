@@ -83,6 +83,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize period input
     updatePeriodInput();
     
+    // Populate 1-on-1 dropdown after data is loaded
+    if (typeof populateOneOnOneMemberSelect === 'function') {
+        populateOneOnOneMemberSelect();
+    }
+    
     // Restore last active section after page refresh
     const lastSection = localStorage.getItem('lastActiveSection') || 'dashboard';
     showSection(lastSection);
