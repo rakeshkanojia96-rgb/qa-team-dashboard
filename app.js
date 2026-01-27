@@ -668,6 +668,9 @@ function showSection(sectionName) {
         renderAppraisalHistory();
     } else if (sectionName === 'analytics') {
         renderAnalytics();
+    } else if (sectionName === 'one-on-one') {
+        populateOneOnOneMemberSelect();
+        applyOneOnOneDateFilter();
     }
 }
 
