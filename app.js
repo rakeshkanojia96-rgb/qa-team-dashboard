@@ -633,7 +633,13 @@ function showSection(sectionName) {
     });
     
     // Show selected section
-    document.getElementById(sectionName + '-section').classList.remove('hidden');
+    const targetSection = document.getElementById(sectionName + '-section');
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    } else {
+        console.error(`Section not found: ${sectionName}-section`);
+        return;
+    }
     
     // Add active class to clicked nav item
     if (event && event.currentTarget) {
