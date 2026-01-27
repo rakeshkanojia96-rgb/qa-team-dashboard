@@ -67,7 +67,23 @@ function getOneOnOneFilteredData(data) {
 // Populate member dropdown
 function populateOneOnOneMemberSelect() {
     const select = document.getElementById('one-on-one-member');
+    if (!select) {
+        console.error('1-on-1 member select not found');
+        return;
+    }
+    
     select.innerHTML = '<option value="">Choose a team member...</option>';
+    
+    // Check if teamMembers is available and populated
+    if (!teamMembers || teamMembers.length === 0) {
+        console.warn('No team members available for 1-on-1 review');
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'No team members found - Please add members first';
+        option.disabled = true;
+        select.appendChild(option);
+        return;
+    }
     
     teamMembers.forEach(member => {
         const option = document.createElement('option');
@@ -75,6 +91,8 @@ function populateOneOnOneMemberSelect() {
         option.textContent = member.name;
         select.appendChild(option);
     });
+    
+    console.log(`Populated 1-on-1 dropdown with ${teamMembers.length} members`);
 }
 
 // Main render function for 1-on-1 review
