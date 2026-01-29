@@ -1043,6 +1043,10 @@ function togglePerformanceFilters() {
 function populatePerformanceFilterDropdowns() {
     // Populate members dropdown
     const memberSelect = document.getElementById('filter-member');
+    if (!memberSelect) {
+        console.warn('filter-member element not found');
+        return;
+    }
     const currentMemberValue = memberSelect.value;
     memberSelect.innerHTML = '<option value="">All Members</option>';
     teamMembers.forEach(member => {
@@ -1052,6 +1056,10 @@ function populatePerformanceFilterDropdowns() {
     
     // Populate projects dropdown with unique projects
     const projectSelect = document.getElementById('filter-project');
+    if (!projectSelect) {
+        console.warn('filter-project element not found');
+        return;
+    }
     const currentProjectValue = projectSelect.value;
     const uniqueProjects = [...new Set(performanceData.map(p => p.projectName).filter(p => p))];
     projectSelect.innerHTML = '<option value="">All Projects</option>';
