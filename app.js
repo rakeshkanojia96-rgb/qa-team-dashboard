@@ -683,8 +683,15 @@ function showSection(sectionName) {
     } else if (sectionName === 'analytics') {
         renderAnalytics();
     } else if (sectionName === 'one-on-one') {
-        populateOneOnOneMemberSelect();
-        applyOneOnOneDateFilter();
+        console.log('🔄 Loading 1-on-1 Review section...');
+        if (typeof populateOneOnOneMemberSelect === 'function') {
+            populateOneOnOneMemberSelect();
+        } else {
+            console.error('populateOneOnOneMemberSelect function not found!');
+        }
+        if (typeof applyOneOnOneDateFilter === 'function') {
+            applyOneOnOneDateFilter();
+        }
     }
 }
 
