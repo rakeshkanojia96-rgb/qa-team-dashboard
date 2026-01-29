@@ -83,14 +83,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize period input
     updatePeriodInput();
     
-    // Populate 1-on-1 dropdown after data is loaded
-    if (typeof populateOneOnOneMemberSelect === 'function') {
-        populateOneOnOneMemberSelect();
-    }
-    
     // Restore last active section after page refresh
     const lastSection = localStorage.getItem('lastActiveSection') || 'dashboard';
     showSection(lastSection);
+    
+    // Populate 1-on-1 dropdown after everything is rendered
+    setTimeout(() => {
+        if (typeof populateOneOnOneMemberSelect === 'function') {
+            populateOneOnOneMemberSelect();
+            console.log('✓ 1-on-1 dropdown initialized on page load');
+        }
+    }, 100);
 
     // Setup event listeners
     setupEventListeners();
