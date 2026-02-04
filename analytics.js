@@ -1,14 +1,14 @@
 // Analytics rendering and calculations
 
-// Analytics date filter state
-let analyticsDateFilter = {
+// Analytics date filter state - restore from localStorage if available
+let analyticsDateFilter = JSON.parse(localStorage.getItem('analyticsDateFilter') || JSON.stringify({
     preset: 'all',
     fromDate: null,
     toDate: null
-};
+}));
 
-// Analytics team members filter state
-let analyticsSelectedMembers = new Set();
+// Analytics team members filter state - restore from localStorage if available
+let analyticsSelectedMembers = new Set(JSON.parse(localStorage.getItem('analyticsSelectedMembers') || '[]'));
 
 // Apply analytics date filter
 function applyAnalyticsDateFilter() {
@@ -43,6 +43,9 @@ function applyAnalyticsDateFilter() {
         }
     }
     
+    // Save filter state to localStorage
+    localStorage.setItem('analyticsDateFilter', JSON.stringify(analyticsDateFilter));
+    
     renderAnalytics();
 }
 
@@ -58,6 +61,9 @@ function clearAnalyticsDateFilter() {
         fromDate: null,
         toDate: null
     };
+    
+    // Save cleared filter to localStorage
+    localStorage.setItem('analyticsDateFilter', JSON.stringify(analyticsDateFilter));
     
     renderAnalytics();
 }
@@ -209,6 +215,9 @@ function toggleAllAnalyticsMembers(event) {
     // Update button label
     updateAnalyticsMembersLabel();
     
+    // Save selected members to localStorage
+    localStorage.setItem('analyticsSelectedMembers', JSON.stringify(Array.from(analyticsSelectedMembers)));
+    
     // Render analytics data only (not the filter UI)
     renderAnalyticsData();
 }
@@ -233,6 +242,9 @@ function toggleAnalyticsMember(memberId) {
     
     // Update button label
     updateAnalyticsMembersLabel();
+    
+    // Save selected members to localStorage
+    localStorage.setItem('analyticsSelectedMembers', JSON.stringify(Array.from(analyticsSelectedMembers)));
     
     renderAnalyticsData();
 }
@@ -268,6 +280,19 @@ function toggleAnalyticsMembersDropdown() {
 
 // Render all analytics
 function renderAnalytics() {
+    // Restore date filter UI from saved state
+    const datePresetDropdown = document.getElementById('analytics-date-preset');
+    if (datePresetDropdown && analyticsDateFilter.preset) {
+        datePresetDropdown.value = analyticsDateFilter.preset;
+        
+        // If custom range, restore the dates and show the custom dates inputs
+        if (analyticsDateFilter.preset === 'custom' && analyticsDateFilter.fromDate && analyticsDateFilter.toDate) {
+            document.getElementById('analytics-date-from').value = analyticsDateFilter.fromDate;
+            document.getElementById('analytics-date-to').value = analyticsDateFilter.toDate;
+            document.getElementById('analytics-custom-dates').style.display = 'flex';
+        }
+    }
+    
     initializeAnalyticsMembersFilter();
     populateAnalyticsMembersFilter();
     renderAnalyticsKPIs();
