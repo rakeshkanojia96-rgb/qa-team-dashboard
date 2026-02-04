@@ -223,6 +223,11 @@ function renderAnalyticsData() {
 function toggleAnalyticsMembersDropdown() {
     const dropdown = document.getElementById('analytics-members-dropdown');
     if (dropdown) {
+        // Ensure members list is populated before showing dropdown
+        const container = document.getElementById('analytics-members-filter');
+        if (container && container.children.length === 0) {
+            populateAnalyticsMembersFilter();
+        }
         dropdown.classList.toggle('hidden');
     }
 }
