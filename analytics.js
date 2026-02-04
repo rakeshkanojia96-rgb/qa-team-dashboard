@@ -338,8 +338,20 @@ function renderAnalyticsKPIs() {
 
 // Render Top Performers
 function renderTopPerformers() {
+    const section = document.getElementById('top-performers-section');
     const container = document.getElementById('top-performers-list');
     const filteredData = getFilteredPerformanceByDate(performanceData);
+    
+    // Hide section if all members or no members selected
+    const selectedCount = analyticsSelectedMembers.size;
+    const totalCount = teamMembers.length;
+    
+    if (selectedCount === 0 || selectedCount === totalCount) {
+        if (section) section.style.display = 'none';
+        return;
+    } else {
+        if (section) section.style.display = 'block';
+    }
     
     if (filteredData.length === 0 || teamMembers.length === 0) {
         container.innerHTML = '<p class="text-gray-500">No performance data available</p>';
@@ -894,8 +906,20 @@ function renderMemberPerformanceSummary() {
     const tbody = document.getElementById('analytics-member-summary');
     const filteredData = getFilteredPerformanceByDate(performanceData);
     
+    // Check if Quality Score column should be shown
+    const selectedCount = analyticsSelectedMembers.size;
+    const totalCount = teamMembers.length;
+    const showQualityScore = selectedCount > 0 && selectedCount < totalCount;
+    
+    // Show/hide Quality Score column header
+    const qualityScoreHeaders = document.querySelectorAll('.quality-score-column');
+    qualityScoreHeaders.forEach(header => {
+        header.style.display = showQualityScore ? '' : 'none';
+    });
+    
     if (filteredData.length === 0 || teamMembers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No data available</td></tr>';
+        const colspan = showQualityScore ? 7 : 6;
+        tbody.innerHTML = `<tr><td colspan="${colspan}" class="px-6 py-4 text-center text-gray-500">No data available</td></tr>`;
         return;
     }
 
@@ -955,7 +979,8 @@ function renderMemberPerformanceSummary() {
             <td class="px-6 py-4 whitespace-nowrap text-center text-gray-600">
                 ${stats.avgPerMonth}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
+            ${showQualityScore ? `
+            <td class="px-6 py-4 whitespace-nowrap text-center quality-score-column">
                 <span class="px-2 py-1 text-xs font-medium rounded-full ${
                     parseFloat(stats.qualityScore) >= 10 ? 'bg-green-100 text-green-800' :
                     parseFloat(stats.qualityScore) >= 5 ? 'bg-yellow-100 text-yellow-800' :
@@ -964,6 +989,7 @@ function renderMemberPerformanceSummary() {
                     ${stats.qualityScore}% defect rate
                 </span>
             </td>
+            ` : ''}
         </tr>
     `).join('');
 }
