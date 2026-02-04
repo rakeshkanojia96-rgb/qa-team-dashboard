@@ -119,7 +119,7 @@ function populateAnalyticsMembersFilter() {
     container.innerHTML = teamMembers.map(member => {
         const isChecked = analyticsSelectedMembers.has(member.id);
         return `
-            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded mb-1">
                 <input type="checkbox" 
                        class="analytics-member-checkbox mr-2 rounded" 
                        value="${member.id}" 
@@ -140,29 +140,46 @@ function populateAnalyticsMembersFilter() {
     }
 }
 
-// Toggle all team members for analytics
-function toggleAllAnalyticsMembers() {
-    const selectAllCheckbox = document.getElementById('analytics-select-all-members');
-    const memberCheckboxes = document.querySelectorAll('.analytics-member-checkbox');
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('analytics-members-dropdown');
+    const button = event.target.closest('button[onclick="toggleAnalyticsMembersDropdown()"]');
+    const dropdownContent = event.target.closest('#analytics-members-dropdown');
     
-    if (selectAllCheckbox.checked) {
+    if (dropdown && !dropdown.classList.contains('hidden') && !button && !dropdownContent) {
+        dropdown.classList.add('hidden');
+    }
+});
+
+// Toggle all team members for analytics
+function toggleAllAnalyticsMembers(event) {
+    // Prevent checkbox state from being overwritten
+    if (event) {
+        event.stopPropagation();
+    }
+    
+    const selectAllCheckbox = document.getElementById('analytics-select-all-members');
+    const isChecked = selectAllCheckbox.checked;
+    
+    if (isChecked) {
         // Select all
         analyticsSelectedMembers.clear();
         teamMembers.forEach(member => {
             analyticsSelectedMembers.add(member.id);
         });
-        memberCheckboxes.forEach(checkbox => {
-            checkbox.checked = true;
-        });
     } else {
         // Deselect all
         analyticsSelectedMembers.clear();
-        memberCheckboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
     }
     
-    renderAnalytics();
+    // Update UI without full re-render to preserve checkbox state
+    const memberCheckboxes = document.querySelectorAll('.analytics-member-checkbox');
+    memberCheckboxes.forEach(checkbox => {
+        checkbox.checked = isChecked;
+    });
+    
+    // Render analytics data only (not the filter UI)
+    renderAnalyticsData();
 }
 
 // Toggle individual team member for analytics
@@ -183,7 +200,31 @@ function toggleAnalyticsMember(memberId) {
     selectAllCheckbox.checked = checkedCount === allCheckboxes.length;
     selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
     
-    renderAnalytics();
+    renderAnalyticsData();
+}
+
+// Render analytics data only (without re-rendering filters)
+function renderAnalyticsData() {
+    renderAnalyticsKPIs();
+    renderTopPerformers();
+    renderPerformanceTrendsChart();
+    renderMemberComparisonChart();
+    renderProjectTestCasesChart();
+    renderProjectExecutionChart();
+    renderTestCasesVsDefectsChart();
+    renderExecutionVsDefectsChart();
+    renderExecutionTicketsDefectsTrendChart();
+    renderAsanaTicketsProjectTrendChart();
+    renderMemberPerformanceSummary();
+    lucide.createIcons();
+}
+
+// Toggle team members dropdown visibility
+function toggleAnalyticsMembersDropdown() {
+    const dropdown = document.getElementById('analytics-members-dropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('hidden');
+    }
 }
 
 // Render all analytics
