@@ -101,27 +101,43 @@ function getFilteredPerformanceByDate(data) {
     return filteredData;
 }
 
+// Initialize analytics members filter (only on first load)
+function initializeAnalyticsMembersFilter() {
+    if (analyticsSelectedMembers.size === 0) {
+        teamMembers.forEach(member => {
+            analyticsSelectedMembers.add(member.id);
+        });
+    }
+}
+
 // Populate team members filter checkboxes
 function populateAnalyticsMembersFilter() {
     const container = document.getElementById('analytics-members-filter');
     if (!container) return;
     
-    // Initialize with all members selected
-    analyticsSelectedMembers.clear();
-    teamMembers.forEach(member => {
-        analyticsSelectedMembers.add(member.id);
-    });
+    // Don't reinitialize - preserve current state
+    container.innerHTML = teamMembers.map(member => {
+        const isChecked = analyticsSelectedMembers.has(member.id);
+        return `
+            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <input type="checkbox" 
+                       class="analytics-member-checkbox mr-2 rounded" 
+                       value="${member.id}" 
+                       onchange="toggleAnalyticsMember('${member.id}')" 
+                       ${isChecked ? 'checked' : ''}>
+                <span class="text-sm text-gray-700">${member.name}</span>
+            </label>
+        `;
+    }).join('');
     
-    container.innerHTML = teamMembers.map(member => `
-        <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
-            <input type="checkbox" 
-                   class="analytics-member-checkbox mr-2 rounded" 
-                   value="${member.id}" 
-                   onchange="toggleAnalyticsMember('${member.id}')" 
-                   checked>
-            <span class="text-sm text-gray-700">${member.name}</span>
-        </label>
-    `).join('');
+    // Update Select All checkbox state
+    const selectAllCheckbox = document.getElementById('analytics-select-all-members');
+    if (selectAllCheckbox) {
+        const checkedCount = analyticsSelectedMembers.size;
+        const totalCount = teamMembers.length;
+        selectAllCheckbox.checked = checkedCount === totalCount;
+        selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
+    }
 }
 
 // Toggle all team members for analytics
@@ -172,6 +188,7 @@ function toggleAnalyticsMember(memberId) {
 
 // Render all analytics
 function renderAnalytics() {
+    initializeAnalyticsMembersFilter();
     populateAnalyticsMembersFilter();
     renderAnalyticsKPIs();
     renderTopPerformers();
