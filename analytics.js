@@ -106,6 +106,35 @@ function initializeAnalyticsMembersFilter() {
     }
 }
 
+// Update team members dropdown button label
+function updateAnalyticsMembersLabel() {
+    const label = document.getElementById('analytics-members-label');
+    if (!label) return;
+    
+    const selectedCount = analyticsSelectedMembers.size;
+    const totalCount = teamMembers.length;
+    
+    if (selectedCount === 0) {
+        label.textContent = 'No Members Selected';
+    } else if (selectedCount === totalCount) {
+        label.textContent = 'All Members';
+    } else if (selectedCount === 1) {
+        // Show single member name
+        const selectedId = Array.from(analyticsSelectedMembers)[0];
+        const member = teamMembers.find(m => m.id === selectedId);
+        label.textContent = member ? member.name : `${selectedCount} Member`;
+    } else if (selectedCount <= 2) {
+        // Show up to 2 names
+        const selectedNames = Array.from(analyticsSelectedMembers)
+            .map(id => teamMembers.find(m => m.id === id)?.name)
+            .filter(name => name);
+        label.textContent = selectedNames.join(', ');
+    } else {
+        // Show count
+        label.textContent = `${selectedCount} Members`;
+    }
+}
+
 // Populate team members filter checkboxes
 function populateAnalyticsMembersFilter() {
     const container = document.getElementById('analytics-members-filter');
@@ -134,6 +163,9 @@ function populateAnalyticsMembersFilter() {
         selectAllCheckbox.checked = checkedCount === totalCount;
         selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
     }
+    
+    // Update button label
+    updateAnalyticsMembersLabel();
 }
 
 // Close dropdown when clicking outside
@@ -174,6 +206,9 @@ function toggleAllAnalyticsMembers(event) {
         checkbox.checked = isChecked;
     });
     
+    // Update button label
+    updateAnalyticsMembersLabel();
+    
     // Render analytics data only (not the filter UI)
     renderAnalyticsData();
 }
@@ -195,6 +230,9 @@ function toggleAnalyticsMember(memberId) {
     
     selectAllCheckbox.checked = checkedCount === allCheckboxes.length;
     selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
+    
+    // Update button label
+    updateAnalyticsMembersLabel();
     
     renderAnalyticsData();
 }
@@ -283,7 +321,19 @@ function renderAnalyticsKPIs() {
     document.getElementById('analytics-tc-trend').textContent = `${totalExecuted.toLocaleString()} executed`;
     document.getElementById('analytics-exec-trend').textContent = execRate >= 80 ? 'Good' : 'Needs improvement';
     document.getElementById('analytics-defects-trend').textContent = `${(totalDefects / filteredData.length).toFixed(1)} avg per record`;
-    document.getElementById('analytics-projects-list').textContent = Array.from(projects).slice(0, 3).join(', ');
+    
+    // Show project names or "No projects"
+    const projectsList = document.getElementById('analytics-projects-list');
+    if (projects.size > 0) {
+        const projectsArray = Array.from(projects);
+        if (projectsArray.length <= 3) {
+            projectsList.textContent = projectsArray.join(', ');
+        } else {
+            projectsList.textContent = `${projectsArray.slice(0, 3).join(', ')} +${projectsArray.length - 3} more`;
+        }
+    } else {
+        projectsList.textContent = 'No projects';
+    }
 }
 
 // Render Top Performers
