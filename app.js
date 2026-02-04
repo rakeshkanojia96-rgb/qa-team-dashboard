@@ -86,14 +86,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Restore last active section after page refresh
     const lastSection = localStorage.getItem('lastActiveSection') || 'dashboard';
     showSection(lastSection);
-    
-    // Populate 1-on-1 dropdown after everything is rendered
-    setTimeout(() => {
-        if (typeof populateOneOnOneMemberSelect === 'function') {
-            populateOneOnOneMemberSelect();
-            console.log('✓ 1-on-1 dropdown initialized on page load');
-        }
-    }, 100);
 
     // Setup event listeners
     setupEventListeners();
@@ -636,13 +628,7 @@ function showSection(sectionName) {
     });
     
     // Show selected section
-    const targetSection = document.getElementById(sectionName + '-section');
-    if (targetSection) {
-        targetSection.classList.remove('hidden');
-    } else {
-        console.error(`Section not found: ${sectionName}-section`);
-        return;
-    }
+    document.getElementById(sectionName + '-section').classList.remove('hidden');
     
     // Add active class to clicked nav item
     if (event && event.currentTarget) {
@@ -682,16 +668,6 @@ function showSection(sectionName) {
         renderAppraisalHistory();
     } else if (sectionName === 'analytics') {
         renderAnalytics();
-    } else if (sectionName === 'one-on-one') {
-        console.log('🔄 Loading 1-on-1 Review section...');
-        if (typeof populateOneOnOneMemberSelect === 'function') {
-            populateOneOnOneMemberSelect();
-        } else {
-            console.error('populateOneOnOneMemberSelect function not found!');
-        }
-        if (typeof applyOneOnOneDateFilter === 'function') {
-            applyOneOnOneDateFilter();
-        }
     }
 }
 
@@ -1043,10 +1019,6 @@ function togglePerformanceFilters() {
 function populatePerformanceFilterDropdowns() {
     // Populate members dropdown
     const memberSelect = document.getElementById('filter-member');
-    if (!memberSelect) {
-        console.warn('filter-member element not found');
-        return;
-    }
     const currentMemberValue = memberSelect.value;
     memberSelect.innerHTML = '<option value="">All Members</option>';
     teamMembers.forEach(member => {
@@ -1056,10 +1028,6 @@ function populatePerformanceFilterDropdowns() {
     
     // Populate projects dropdown with unique projects
     const projectSelect = document.getElementById('filter-project');
-    if (!projectSelect) {
-        console.warn('filter-project element not found');
-        return;
-    }
     const currentProjectValue = projectSelect.value;
     const uniqueProjects = [...new Set(performanceData.map(p => p.projectName).filter(p => p))];
     projectSelect.innerHTML = '<option value="">All Projects</option>';
