@@ -7,6 +7,9 @@ let analyticsDateFilter = {
     toDate: null
 };
 
+// Analytics team members filter state
+let analyticsSelectedMembers = new Set();
+
 // Apply analytics date filter
 function applyAnalyticsDateFilter() {
     const preset = document.getElementById('analytics-date-preset').value;
@@ -63,35 +66,113 @@ function clearAnalyticsDateFilter() {
     renderAnalytics();
 }
 
-// Filter performance data by date
+// Filter performance data by date and team members
 function getFilteredPerformanceByDate(data) {
-    if (!analyticsDateFilter.fromDate || !analyticsDateFilter.toDate) {
-        return data;
+    let filteredData = data;
+    
+    // Filter by date range
+    if (analyticsDateFilter.fromDate && analyticsDateFilter.toDate) {
+        filteredData = filteredData.filter(perf => {
+            const perfDate = perf.period || perf.month;
+            if (!perfDate) return false;
+            
+            // Handle different date formats: "YYYY-MM-DD" or "YYYY-MM"
+            // Convert to comparable format
+            let perfDateComparable = perfDate;
+            if (perfDate.length === 7) {
+                // Format is "YYYY-MM", add day for comparison
+                perfDateComparable = perfDate + '-01';
+            }
+            
+            // Extract year-month for comparison
+            const perfYearMonth = perfDateComparable.substring(0, 7);
+            const fromYearMonth = analyticsDateFilter.fromDate.substring(0, 7);
+            const toYearMonth = analyticsDateFilter.toDate.substring(0, 7);
+            
+            return perfYearMonth >= fromYearMonth && perfYearMonth <= toYearMonth;
+        });
     }
     
-    return data.filter(perf => {
-        const perfDate = perf.period || perf.month;
-        if (!perfDate) return false;
-        
-        // Handle different date formats: "YYYY-MM-DD" or "YYYY-MM"
-        // Convert to comparable format
-        let perfDateComparable = perfDate;
-        if (perfDate.length === 7) {
-            // Format is "YYYY-MM", add day for comparison
-            perfDateComparable = perfDate + '-01';
-        }
-        
-        // Extract year-month for comparison
-        const perfYearMonth = perfDateComparable.substring(0, 7);
-        const fromYearMonth = analyticsDateFilter.fromDate.substring(0, 7);
-        const toYearMonth = analyticsDateFilter.toDate.substring(0, 7);
-        
-        return perfYearMonth >= fromYearMonth && perfYearMonth <= toYearMonth;
+    // Filter by selected team members
+    if (analyticsSelectedMembers.size > 0) {
+        filteredData = filteredData.filter(perf => analyticsSelectedMembers.has(perf.memberId));
+    }
+    
+    return filteredData;
+}
+
+// Populate team members filter checkboxes
+function populateAnalyticsMembersFilter() {
+    const container = document.getElementById('analytics-members-filter');
+    if (!container) return;
+    
+    // Initialize with all members selected
+    analyticsSelectedMembers.clear();
+    teamMembers.forEach(member => {
+        analyticsSelectedMembers.add(member.id);
     });
+    
+    container.innerHTML = teamMembers.map(member => `
+        <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+            <input type="checkbox" 
+                   class="analytics-member-checkbox mr-2 rounded" 
+                   value="${member.id}" 
+                   onchange="toggleAnalyticsMember('${member.id}')" 
+                   checked>
+            <span class="text-sm text-gray-700">${member.name}</span>
+        </label>
+    `).join('');
+}
+
+// Toggle all team members for analytics
+function toggleAllAnalyticsMembers() {
+    const selectAllCheckbox = document.getElementById('analytics-select-all-members');
+    const memberCheckboxes = document.querySelectorAll('.analytics-member-checkbox');
+    
+    if (selectAllCheckbox.checked) {
+        // Select all
+        analyticsSelectedMembers.clear();
+        teamMembers.forEach(member => {
+            analyticsSelectedMembers.add(member.id);
+        });
+        memberCheckboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    } else {
+        // Deselect all
+        analyticsSelectedMembers.clear();
+        memberCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }
+    
+    renderAnalytics();
+}
+
+// Toggle individual team member for analytics
+function toggleAnalyticsMember(memberId) {
+    const checkbox = document.querySelector(`.analytics-member-checkbox[value="${memberId}"]`);
+    
+    if (checkbox.checked) {
+        analyticsSelectedMembers.add(memberId);
+    } else {
+        analyticsSelectedMembers.delete(memberId);
+    }
+    
+    // Update Select All checkbox state
+    const selectAllCheckbox = document.getElementById('analytics-select-all-members');
+    const allCheckboxes = document.querySelectorAll('.analytics-member-checkbox');
+    const checkedCount = document.querySelectorAll('.analytics-member-checkbox:checked').length;
+    
+    selectAllCheckbox.checked = checkedCount === allCheckboxes.length;
+    selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
+    
+    renderAnalytics();
 }
 
 // Render all analytics
 function renderAnalytics() {
+    populateAnalyticsMembersFilter();
     renderAnalyticsKPIs();
     renderTopPerformers();
     renderPerformanceTrendsChart();

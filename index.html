@@ -1140,6 +1140,21 @@
                             <i data-lucide="x" width="16" height="16" class="inline"></i>
                         </button>
                     </div>
+                    
+                    <!-- Team Members Filter -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <i data-lucide="users" width="20" height="20" class="text-gray-600"></i>
+                            <label class="text-sm font-medium text-gray-700">Team Members:</label>
+                            <label class="flex items-center ml-4 cursor-pointer">
+                                <input type="checkbox" id="analytics-select-all-members" onchange="toggleAllAnalyticsMembers()" checked class="mr-2 rounded">
+                                <span class="text-sm text-gray-600">Select All</span>
+                            </label>
+                        </div>
+                        <div id="analytics-members-filter" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                            <!-- Team member checkboxes will be populated here -->
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Analytics KPI Cards -->
