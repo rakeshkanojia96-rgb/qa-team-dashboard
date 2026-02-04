@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Restore last active section after page refresh
     const lastSection = localStorage.getItem('lastActiveSection') || 'dashboard';
+    console.log('🔄 Restoring last section:', lastSection);
     showSection(lastSection);
 
     // Setup event listeners
@@ -616,6 +617,7 @@ function toggleSection(sectionId) {
 function showSection(sectionName) {
     // Save current section to localStorage
     localStorage.setItem('lastActiveSection', sectionName);
+    console.log('💾 Saved section to localStorage:', sectionName);
     
     // Hide all sections
     document.querySelectorAll('.section').forEach(section => {
