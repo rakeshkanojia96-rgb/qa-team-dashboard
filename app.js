@@ -1695,7 +1695,7 @@ function deleteGoal(goalId) {
 
 // Dashboard date filter state
 let dashboardDateFilter = {
-    preset: '30',
+    preset: 'all',
     fromDate: null,
     toDate: null
 };
@@ -1733,19 +1733,15 @@ function applyDashboardDateFilter() {
 
 // Clear dashboard date filter
 function clearDashboardDateFilter() {
-    document.getElementById('dashboard-date-preset').value = '30';
+    document.getElementById('dashboard-date-preset').value = 'all';
     document.getElementById('dashboard-date-from').value = '';
     document.getElementById('dashboard-date-to').value = '';
     document.getElementById('dashboard-custom-dates').style.display = 'none';
     
-    const toDate = new Date();
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - 30);
-    
     dashboardDateFilter = {
-        preset: '30',
-        fromDate: fromDate.toISOString().split('T')[0],
-        toDate: toDate.toISOString().split('T')[0]
+        preset: 'all',
+        fromDate: null,
+        toDate: null
     };
     
     updateDashboard();

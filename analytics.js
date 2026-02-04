@@ -2,7 +2,7 @@
 
 // Analytics date filter state
 let analyticsDateFilter = {
-    preset: '30',
+    preset: 'all',
     fromDate: null,
     toDate: null
 };
@@ -48,19 +48,15 @@ function applyAnalyticsDateFilter() {
 
 // Clear analytics date filter
 function clearAnalyticsDateFilter() {
-    document.getElementById('analytics-date-preset').value = '30';
+    document.getElementById('analytics-date-preset').value = 'all';
     document.getElementById('analytics-date-from').value = '';
     document.getElementById('analytics-date-to').value = '';
     document.getElementById('analytics-custom-dates').style.display = 'none';
     
-    const toDate = new Date();
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - 30);
-    
     analyticsDateFilter = {
-        preset: '30',
-        fromDate: fromDate.toISOString().split('T')[0],
-        toDate: toDate.toISOString().split('T')[0]
+        preset: 'all',
+        fromDate: null,
+        toDate: null
     };
     
     renderAnalytics();
