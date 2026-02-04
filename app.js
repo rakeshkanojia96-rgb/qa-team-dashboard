@@ -60,12 +60,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadAllData();
     
     // Render all sections with loaded data
-    renderDashboard();
+    updateDashboard();
     renderTeamMembers();
-    renderPerformanceMetrics();
-    renderAttendance();
-    renderHolidays();
-    renderAppraisal();
+    renderPerformanceHistory();
+    renderAttendanceHistory();
+    renderAttendanceSummary();
+    renderHolidaysList();
+    renderAppraisalHistory();
     renderAnalytics();
     updateAttendanceStats();
     
