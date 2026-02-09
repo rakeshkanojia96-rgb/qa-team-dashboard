@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupEventListeners();
 });
 
-// Load all data from localStorage (priority) or data.json (fallback)
+// Load all data - prioritize localStorage per data type, fallback to data.json
 async function loadAllData() {
     // Don't load any data if not authenticated
     if (!currentAuthUser) {
@@ -101,57 +101,68 @@ async function loadAllData() {
         return;
     }
     
-    // Check if localStorage has data (prioritize localStorage since it contains user edits/imports)
-    const hasLocalStorage = localStorage.getItem(STORAGE_KEYS.MEMBERS) || 
-                           localStorage.getItem(STORAGE_KEYS.PERFORMANCE) ||
-                           localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
-    
-    if (hasLocalStorage) {
-        // Load from localStorage (contains user's imported/edited data)
-        teamMembers = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
-        performanceData = JSON.parse(localStorage.getItem(STORAGE_KEYS.PERFORMANCE) || '[]');
-        attendanceData = JSON.parse(localStorage.getItem(STORAGE_KEYS.ATTENDANCE) || '[]');
-        goalsData = JSON.parse(localStorage.getItem(STORAGE_KEYS.GOALS) || '[]');
-        ratingsData = JSON.parse(localStorage.getItem(STORAGE_KEYS.RATINGS) || '[]');
-        holidaysData = JSON.parse(localStorage.getItem(STORAGE_KEYS.HOLIDAYS) || '[]');
-        
-        const savedSettings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || '{}');
-        appSettings = {
-            weekendDays: savedSettings.weekendDays || [0, 6],
-            excludeWeekendsFromAttendance: savedSettings.excludeWeekendsFromAttendance !== false
-        };
-        
-        console.log('✓ Data loaded from localStorage (user data preserved)');
-        return;
-    }
-    
-    // Fallback: Try to load from data.json (initial/default data)
+    // Try to load data.json first to get defaults
+    let webData = null;
     try {
         const response = await fetch('data.json');
         if (response.ok) {
-            const webData = await response.json();
-            
-            // Apply web data to app
-            teamMembers = webData.teamMembers || [];
-            performanceData = webData.performanceData || [];
-            attendanceData = webData.attendanceData || [];
-            goalsData = webData.goalsData || [];
-            ratingsData = webData.ratingsData || [];
-            holidaysData = webData.holidaysData || [];
-            appSettings = webData.appSettings || {
-                weekendDays: [0, 6],
-                excludeWeekendsFromAttendance: true
-            };
-            
-            console.log('✓ Data loaded from data.json (initial load)');
-            return;
+            webData = await response.json();
+            console.log('✓ data.json loaded as fallback');
         }
     } catch (err) {
         console.warn('Could not load data.json:', err);
     }
     
-    // If both fail, initialize with empty data
-    console.log('⚠️ No data source available, starting fresh');
+    // For each data type: use localStorage if exists, otherwise use data.json
+    // This ensures user edits/imports are preserved while still loading other data
+    
+    teamMembers = localStorage.getItem(STORAGE_KEYS.MEMBERS) 
+        ? JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS))
+        : (webData?.teamMembers || []);
+    
+    performanceData = localStorage.getItem(STORAGE_KEYS.PERFORMANCE)
+        ? JSON.parse(localStorage.getItem(STORAGE_KEYS.PERFORMANCE))
+        : (webData?.performanceData || []);
+    
+    attendanceData = localStorage.getItem(STORAGE_KEYS.ATTENDANCE)
+        ? JSON.parse(localStorage.getItem(STORAGE_KEYS.ATTENDANCE))
+        : (webData?.attendanceData || []);
+    
+    goalsData = localStorage.getItem(STORAGE_KEYS.GOALS)
+        ? JSON.parse(localStorage.getItem(STORAGE_KEYS.GOALS))
+        : (webData?.goalsData || []);
+    
+    ratingsData = localStorage.getItem(STORAGE_KEYS.RATINGS)
+        ? JSON.parse(localStorage.getItem(STORAGE_KEYS.RATINGS))
+        : (webData?.ratingsData || []);
+    
+    holidaysData = localStorage.getItem(STORAGE_KEYS.HOLIDAYS)
+        ? JSON.parse(localStorage.getItem(STORAGE_KEYS.HOLIDAYS))
+        : (webData?.holidaysData || []);
+    
+    const savedSettings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || '{}');
+    appSettings = {
+        weekendDays: savedSettings.weekendDays || webData?.appSettings?.weekendDays || [0, 6],
+        excludeWeekendsFromAttendance: savedSettings.excludeWeekendsFromAttendance !== undefined 
+            ? savedSettings.excludeWeekendsFromAttendance 
+            : (webData?.appSettings?.excludeWeekendsFromAttendance !== false)
+    };
+    
+    // Log what was loaded from where
+    const localStorageCount = [
+        localStorage.getItem(STORAGE_KEYS.MEMBERS) ? 'members' : null,
+        localStorage.getItem(STORAGE_KEYS.PERFORMANCE) ? 'performance' : null,
+        localStorage.getItem(STORAGE_KEYS.ATTENDANCE) ? 'attendance' : null,
+        localStorage.getItem(STORAGE_KEYS.GOALS) ? 'goals' : null,
+        localStorage.getItem(STORAGE_KEYS.RATINGS) ? 'ratings' : null,
+        localStorage.getItem(STORAGE_KEYS.HOLIDAYS) ? 'holidays' : null
+    ].filter(Boolean);
+    
+    if (localStorageCount.length > 0) {
+        console.log(`✓ Data loaded: ${localStorageCount.join(', ')} from localStorage, rest from data.json`);
+    } else {
+        console.log('✓ All data loaded from data.json');
+    }
 }
 
 // Save data to localStorage
